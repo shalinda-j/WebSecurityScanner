@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+
+{% block title %}Configure APT Simulation - Web App Penetration Testing Toolkit{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">
+                        <i class="fas fa-cogs me-2"></i>Configure APT Simulation
+                    </h2>
+                    <a href="{{ url_for('apt_bp.apt_dashboard') }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Back to APT Dashboard
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Important:</strong> Only run APT simulations against systems you own or have explicit permission to test. Running simulations against unauthorized targets may be illegal and unethical.
+                </div>
+                
+                <form method="POST" action="{{ url_for('apt_bp.apt_simulator') }}">
+                    <!-- Target Configuration -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary bg-opacity-10">
+                            <h4 class="mb-0">Target Configuration</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="target_url" class="form-label">Target URL</label>
+                                <input type="url" class="form-control" id="target_url" name="target_url" 
+                                       placeholder="https://example.com" required>
+                                <div class="form-text">
+                                    Enter the base URL of the system you want to simulate APT attacks against.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Scenario Selection -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-info bg-opacity-10">
+                            <h4 class="mb-0">Scenario Selection</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="scenario" class="form-label">Select Simulation Scenario</label>
+                                <select class="form-select" id="scenario" name="scenario">
+                                    {% for scenario in scenarios %}
+                                    <option value="{{ scenario.id }}" 
+                                            {% if request.args.get('scenario') == scenario.id %}selected{% endif %}>
+                                        {{ scenario.name }} - {{ scenario.description }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">
+                                    Each scenario represents different APT tactics and objectives.
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="intensity" class="form-label">Simulation Intensity</label>
+                                <select class="form-select" id="intensity" name="intensity">
+                                    <option value="low">Low - Basic simulation with minimal activity</option>
+                                    <option value="medium" selected>Medium - Balanced simulation suitable for most environments</option>
+                                    <option value="high">High - Thorough simulation with comprehensive techniques</option>
+                                </select>
+                                <div class="form-text">
+                                    Higher intensity simulations will be more thorough but may take longer to complete.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Advanced Options (Techniques) -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-secondary bg-opacity-10">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h4 class="mb-0">Advanced Options (Techniques)</h4>
+                                <button class="btn btn-sm btn-outline-secondary" type="button" 
+                                        data-bs-toggle="collapse" data-bs-target="#advancedOptions">
+                                    <i class="fas fa-caret-down"></i> Show/Hide
+                                </button>
+                            </div>
+                        </div>
+                        <div class="collapse" id="advancedOptions">
+                            <div class="card-body">
+                                <div class="alert alert-info mb-3">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    By default, the simulator will use techniques appropriate for the selected scenario. 
+                                    Use these options to customize which techniques are included in the simulation.
+                                </div>
+                                
+                                {% for phase, phase_techniques in techniques.items() %}
+                                <div class="card mb-3">
+                                    <div class="card-header 
+                                        {% if phase == 'initial_access' %}bg-danger
+                                        {% elif phase == 'persistence' %}bg-warning
+                                        {% elif phase == 'privilege_escalation' %}bg-info
+                                        {% elif phase == 'lateral_movement' %}bg-success
+                                        {% else %}bg-primary{% endif %} bg-opacity-10">
+                                        <h5 class="mb-0">{{ phase|replace('_', ' ')|title }}</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            {% for technique in phase_techniques %}
+                                                {% set technique_id = phase + '_' + technique|lower|replace(' ', '_') %}
+                                                <div class="col-md-4 mb-2">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" 
+                                                               id="{{ technique_id }}" name="{{ technique_id }}" checked>
+                                                        <label class="form-check-label" for="{{ technique_id }}">
+                                                            {{ technique }}
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-play me-2"></i>Start APT Simulation
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Show advanced options if any technique checkbox is unchecked
+        const advancedOptions = document.getElementById('advancedOptions');
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        
+        checkboxes.forEach(function(checkbox) {
+            checkbox.addEventListener('change', function() {
+                if (!this.checked) {
+                    advancedOptions.classList.add('show');
+                }
+            });
+        });
+        
+        // Update techniques based on scenario selection
+        const scenarioSelect = document.getElementById('scenario');
+        
+        scenarioSelect.addEventListener('change', function() {
+            const scenario = this.value;
+            
+            // Enable/disable techniques based on selected scenario
+            if (scenario === 'data_exfiltration') {
+                // For data exfiltration scenario, focus on those techniques
+                highlightPhase('data_exfiltration');
+            } else if (scenario === 'ransomware') {
+                // For ransomware scenario, focus on persistence and privilege escalation
+                highlightPhase('persistence');
+                highlightPhase('privilege_escalation');
+            } else if (scenario === 'supply_chain') {
+                // For supply chain scenario, focus on initial access
+                highlightPhase('initial_access');
+            } else {
+                // For default/comprehensive scenario, all techniques are relevant
+                resetAllPhases();
+            }
+        });
+        
+        // Trigger change event to set initial state
+        scenarioSelect.dispatchEvent(new Event('change'));
+        
+        function highlightPhase(phaseToHighlight) {
+            const phases = ['initial_access', 'persistence', 'privilege_escalation', 'lateral_movement', 'data_exfiltration'];
+            
+            phases.forEach(function(phase) {
+                const phaseCheckboxes = document.querySelectorAll(`input[id^="${phase}_"]`);
+                
+                phaseCheckboxes.forEach(function(checkbox) {
+                    if (phase === phaseToHighlight) {
+                        checkbox.checked = true;
+                        checkbox.closest('.col-md-4').classList.add('text-primary');
+                    } else {
+                        checkbox.checked = phase === 'initial_access'; // Always keep some initial access
+                        checkbox.closest('.col-md-4').classList.remove('text-primary');
+                    }
+                });
+            });
+        }
+        
+        function resetAllPhases() {
+            const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+            
+            allCheckboxes.forEach(function(checkbox) {
+                checkbox.checked = true;
+                checkbox.closest('.col-md-4').classList.remove('text-primary');
+            });
+        }
+    });
+</script>
+{% endblock %}

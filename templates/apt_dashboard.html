@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block title %}APT Simulator - Web App Penetration Testing Toolkit{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">
+                        <i class="fas fa-user-secret me-2"></i>Advanced Persistent Threat Simulator
+                    </h2>
+                    <a href="{{ url_for('dashboard_bp.index') }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>What is an APT Simulator?</strong> The Advanced Persistent Threat (APT) simulator emulates sophisticated attack techniques used by nation-state actors and advanced adversaries to help organizations assess their security posture against such threats.
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-lg-6">
+                        <div class="card h-100">
+                            <div class="card-header bg-primary bg-opacity-10">
+                                <h4 class="mb-0">Start a New APT Simulation</h4>
+                            </div>
+                            <div class="card-body">
+                                <p>Configure and run a new APT simulation against your target system.</p>
+                                <p><strong>What to expect:</strong> The simulator will emulate various attack techniques and identify security vulnerabilities in your system related to sophisticated attack patterns.</p>
+                                <a href="{{ url_for('apt_bp.apt_simulator') }}" class="btn btn-primary">
+                                    <i class="fas fa-play me-2"></i>Create New Simulation
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="card h-100">
+                            <div class="card-header bg-info bg-opacity-10">
+                                <h4 class="mb-0">APT Tactics & Techniques</h4>
+                            </div>
+                            <div class="card-body">
+                                <p>Learn about APT tactics, techniques, and procedures (TTPs) used by advanced threat actors.</p>
+                                <p><strong>Why it matters:</strong> Understanding how advanced adversaries operate helps you better prepare your defenses and detection capabilities.</p>
+                                <a href="{{ url_for('apt_bp.apt_tactics') }}" class="btn btn-info">
+                                    <i class="fas fa-book me-2"></i>Learn About APT TTPs
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Available Scenarios -->
+                <h4 class="mb-3">
+                    <i class="fas fa-sitemap me-2"></i>Available Simulation Scenarios
+                </h4>
+                <div class="row mb-4">
+                    {% for scenario in scenarios %}
+                    <div class="col-lg-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header {% if scenario.id == 'default' %}bg-primary{% elif scenario.id == 'data_exfiltration' %}bg-info{% elif scenario.id == 'ransomware' %}bg-danger{% else %}bg-warning{% endif %} bg-opacity-10">
+                                <h5 class="mb-0">{{ scenario.name }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <p>{{ scenario.description }}</p>
+                                <p><strong>Estimated Duration:</strong> {{ scenario.duration_estimate }}</p>
+                                <a href="{{ url_for('apt_bp.apt_simulator') }}?scenario={{ scenario.id }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-play me-1"></i>Use This Scenario
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- APT Attack Phases -->
+                <h4 class="mb-3">
+                    <i class="fas fa-project-diagram me-2"></i>APT Attack Phases
+                </h4>
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            {% for phase, phase_techniques in techniques.items() %}
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header 
+                                        {% if phase == 'initial_access' %}bg-danger
+                                        {% elif phase == 'persistence' %}bg-warning
+                                        {% elif phase == 'privilege_escalation' %}bg-info
+                                        {% elif phase == 'lateral_movement' %}bg-success
+                                        {% else %}bg-primary{% endif %} bg-opacity-10">
+                                        <h5 class="mb-0">{{ phase|replace('_', ' ')|title }}</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul class="list-group list-group-flush">
+                                            {% for technique in phase_techniques %}
+                                            <li class="list-group-item">
+                                                <i class="fas fa-angle-right me-2"></i>{{ technique }}
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent APT Simulations -->
+                <h4 class="mb-3">
+                    <i class="fas fa-history me-2"></i>Recent APT Simulations
+                </h4>
+                <div class="card">
+                    <div class="card-body">
+                        {% if recent_scans %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Target</th>
+                                            <th>Date</th>
+                                            <th>Status</th>
+                                            <th>Vulnerabilities</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for scan in recent_scans %}
+                                        <tr>
+                                            <td>{{ scan.target_url }}</td>
+                                            <td>{{ scan.scan_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                                            <td>
+                                                {% if scan.status == 'completed' %}
+                                                    <span class="badge bg-success">Completed</span>
+                                                {% elif scan.status == 'in_progress' %}
+                                                    <span class="badge bg-info">In Progress</span>
+                                                {% elif scan.status == 'failed' %}
+                                                    <span class="badge bg-danger">Failed</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">{{ scan.status }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if scan.report %}
+                                                    {{ scan.report.vulnerabilities.count() }}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if scan.status == 'in_progress' or scan.status == 'pending' %}
+                                                    <a href="{{ url_for('apt_bp.apt_status', scan_id=scan.id) }}" class="btn btn-sm btn-info">
+                                                        <i class="fas fa-spinner"></i>
+                                                    </a>
+                                                {% elif scan.report %}
+                                                    <a href="{{ url_for('apt_bp.apt_results', report_id=scan.report.id) }}" class="btn btn-sm btn-primary">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>No APT simulations have been performed yet.
+                                <a href="{{ url_for('apt_bp.apt_simulator') }}" class="alert-link">Start your first simulation</a>.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

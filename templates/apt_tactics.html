@@ -1,0 +1,584 @@
+{% extends 'base.html' %}
+
+{% block title %}APT Tactics & Techniques - Web App Penetration Testing Toolkit{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">
+                        <i class="fas fa-book me-2"></i>APT Tactics & Techniques
+                    </h2>
+                    <a href="{{ url_for('apt_bp.apt_dashboard') }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Back to APT Dashboard
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>What are APTs?</strong> Advanced Persistent Threats (APTs) are sophisticated, prolonged attack campaigns 
+                    where adversaries gain and maintain unauthorized access to networks and systems. They typically use a variety of 
+                    attack vectors and techniques to evade detection while extracting valuable data over extended periods.
+                </div>
+                
+                <!-- APT Overview -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary bg-opacity-10">
+                        <h4 class="mb-0">APT Overview</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Key Characteristics of APTs</h5>
+                                <ul class="list-group mb-4">
+                                    <li class="list-group-item">
+                                        <i class="fas fa-chess me-2 text-primary"></i>
+                                        <strong>Advanced</strong> - Utilizing sophisticated techniques and custom malware
+                                    </li>
+                                    <li class="list-group-item">
+                                        <i class="fas fa-hourglass-half me-2 text-danger"></i>
+                                        <strong>Persistent</strong> - Long-term access and presence in target networks
+                                    </li>
+                                    <li class="list-group-item">
+                                        <i class="fas fa-users me-2 text-warning"></i>
+                                        <strong>Organized Actors</strong> - Often nation-states, criminal organizations, or well-funded groups
+                                    </li>
+                                    <li class="list-group-item">
+                                        <i class="fas fa-crosshairs me-2 text-success"></i>
+                                        <strong>Targeted</strong> - Specific organizations or industries are chosen with clear objectives
+                                    </li>
+                                    <li class="list-group-item">
+                                        <i class="fas fa-mask me-2 text-info"></i>
+                                        <strong>Evasive</strong> - Designed to avoid detection by traditional security measures
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Common APT Objectives</h5>
+                                <ul class="list-group mb-4">
+                                    <li class="list-group-item">
+                                        <i class="fas fa-file-alt me-2 text-danger"></i>
+                                        <strong>Data Theft</strong> - Intellectual property, customer data, financial information
+                                    </li>
+                                    <li class="list-group-item">
+                                        <i class="fas fa-microchip me-2 text-warning"></i>
+                                        <strong>Industrial Espionage</strong> - Stealing technological innovations and trade secrets
+                                    </li>
+                                    <li class="list-group-item">
+                                        <i class="fas fa-globe me-2 text-primary"></i>
+                                        <strong>Geopolitical Advantage</strong> - Nation-state intelligence gathering
+                                    </li>
+                                    <li class="list-group-item">
+                                        <i class="fas fa-money-bill-wave me-2 text-success"></i>
+                                        <strong>Financial Gain</strong> - Theft of financial assets or ransomware operations
+                                    </li>
+                                    <li class="list-group-item">
+                                        <i class="fas fa-power-off me-2 text-danger"></i>
+                                        <strong>Infrastructure Disruption</strong> - Critical systems sabotage
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- APT Kill Chain -->
+                <div class="card mb-4">
+                    <div class="card-header bg-danger bg-opacity-10">
+                        <h4 class="mb-0">The APT Kill Chain</h4>
+                    </div>
+                    <div class="card-body">
+                        <p>The "kill chain" describes the typical phases of an APT attack from initial reconnaissance to objective completion:</p>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <div class="position-relative mb-5">
+                                    <div class="progress" style="height: 3px;">
+                                        <div class="progress-bar bg-danger" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="progress-bar bg-info" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="progress-bar bg-primary" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    
+                                    <!-- Phase markers -->
+                                    <div class="position-absolute" style="left: 10%; top: 10px; transform: translateX(-50%);">
+                                        <div class="badge bg-danger p-2 rounded-circle"><i class="fas fa-1"></i></div>
+                                    </div>
+                                    <div class="position-absolute" style="left: 30%; top: 10px; transform: translateX(-50%);">
+                                        <div class="badge bg-warning p-2 rounded-circle"><i class="fas fa-2"></i></div>
+                                    </div>
+                                    <div class="position-absolute" style="left: 50%; top: 10px; transform: translateX(-50%);">
+                                        <div class="badge bg-info p-2 rounded-circle"><i class="fas fa-3"></i></div>
+                                    </div>
+                                    <div class="position-absolute" style="left: 70%; top: 10px; transform: translateX(-50%);">
+                                        <div class="badge bg-success p-2 rounded-circle"><i class="fas fa-4"></i></div>
+                                    </div>
+                                    <div class="position-absolute" style="left: 90%; top: 10px; transform: translateX(-50%);">
+                                        <div class="badge bg-primary p-2 rounded-circle"><i class="fas fa-5"></i></div>
+                                    </div>
+                                    
+                                    <!-- Phase labels -->
+                                    <div class="position-absolute" style="left: 10%; top: 40px; transform: translateX(-50%);">
+                                        <div class="text-center">
+                                            <small class="d-block">Phase 1</small>
+                                            <strong class="d-block">Initial Access</strong>
+                                        </div>
+                                    </div>
+                                    <div class="position-absolute" style="left: 30%; top: 40px; transform: translateX(-50%);">
+                                        <div class="text-center">
+                                            <small class="d-block">Phase 2</small>
+                                            <strong class="d-block">Persistence</strong>
+                                        </div>
+                                    </div>
+                                    <div class="position-absolute" style="left: 50%; top: 40px; transform: translateX(-50%);">
+                                        <div class="text-center">
+                                            <small class="d-block">Phase 3</small>
+                                            <strong class="d-block">Privilege Escalation</strong>
+                                        </div>
+                                    </div>
+                                    <div class="position-absolute" style="left: 70%; top: 40px; transform: translateX(-50%);">
+                                        <div class="text-center">
+                                            <small class="d-block">Phase 4</small>
+                                            <strong class="d-block">Lateral Movement</strong>
+                                        </div>
+                                    </div>
+                                    <div class="position-absolute" style="left: 90%; top: 40px; transform: translateX(-50%);">
+                                        <div class="text-center">
+                                            <small class="d-block">Phase 5</small>
+                                            <strong class="d-block">Data Exfiltration</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Detailed Tactics & Techniques -->
+                <h4 class="mb-3">
+                    <i class="fas fa-project-diagram me-2"></i>Detailed Tactics & Techniques
+                </h4>
+                
+                {% for phase, phase_techniques in techniques.items() %}
+                <div class="card mb-4">
+                    <div class="card-header 
+                        {% if phase == 'initial_access' %}bg-danger
+                        {% elif phase == 'persistence' %}bg-warning
+                        {% elif phase == 'privilege_escalation' %}bg-info
+                        {% elif phase == 'lateral_movement' %}bg-success
+                        {% else %}bg-primary{% endif %} bg-opacity-10">
+                        <div class="d-flex align-items-center">
+                            <span class="badge 
+                                {% if phase == 'initial_access' %}bg-danger
+                                {% elif phase == 'persistence' %}bg-warning
+                                {% elif phase == 'privilege_escalation' %}bg-info
+                                {% elif phase == 'lateral_movement' %}bg-success
+                                {% else %}bg-primary{% endif %} me-2">
+                                {% if phase == 'initial_access' %}1
+                                {% elif phase == 'persistence' %}2
+                                {% elif phase == 'privilege_escalation' %}3
+                                {% elif phase == 'lateral_movement' %}4
+                                {% else %}5{% endif %}
+                            </span>
+                            <h4 class="mb-0">
+                                {% if phase == 'initial_access' %}
+                                    <i class="fas fa-door-open me-2"></i>
+                                {% elif phase == 'persistence' %}
+                                    <i class="fas fa-plug me-2"></i>
+                                {% elif phase == 'privilege_escalation' %}
+                                    <i class="fas fa-level-up-alt me-2"></i>
+                                {% elif phase == 'lateral_movement' %}
+                                    <i class="fas fa-network-wired me-2"></i>
+                                {% else %}
+                                    <i class="fas fa-file-export me-2"></i>
+                                {% endif %}
+                                {{ phase|replace('_', ' ')|title }} Phase
+                            </h4>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {% if phase == 'initial_access' %}
+                            <p class="lead">This phase focuses on techniques used by attackers to gain their initial foothold in the target environment.</p>
+                            
+                            <div class="row mt-4">
+                                <div class="col-md-6 mb-4">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-danger bg-opacity-10">
+                                            <h5 class="mb-0">Spear Phishing</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p>Targeted emails to specific individuals containing malicious attachments or links.</p>
+                                            <ul>
+                                                <li>Often researched to appear legitimate and trustworthy</li>
+                                                <li>May impersonate colleagues, partners, or trusted organizations</li>
+                                                <li>Usually contain malicious office documents, PDFs, or executables</li>
+                                            </ul>
+                                        </div>
+                                        <div class="card-footer bg-transparent">
+                                            <small class="text-muted">Defense: Email filtering, user awareness training, attachment sandboxing</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-danger bg-opacity-10">
+                                            <h5 class="mb-0">Web Application Exploitation</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p>Exploiting vulnerabilities in public-facing web applications to gain access.</p>
+                                            <ul>
+                                                <li>SQL injection, cross-site scripting (XSS), and CSRF attacks</li>
+                                                <li>Exploitation of known vulnerabilities in web frameworks</li>
+                                                <li>Authentication bypass and insecure direct object references</li>
+                                            </ul>
+                                        </div>
+                                        <div class="card-footer bg-transparent">
+                                            <small class="text-muted">Defense: Regular patching, WAF implementation, secure coding practices</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-danger bg-opacity-10">
+                                            <h5 class="mb-0">Supply Chain Compromise</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p>Targeting third-party vendors or software to compromise the primary target.</p>
+                                            <ul>
+                                                <li>Compromise of software update mechanisms</li>
+                                                <li>Injecting malicious code into legitimate software packages</li>
+                                                <li>Using trusted relationships to bypass security controls</li>
+                                            </ul>
+                                        </div>
+                                        <div class="card-footer bg-transparent">
+                                            <small class="text-muted">Defense: Vendor security assessments, code signing verification, SBOM practices</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        {% elif phase == 'persistence' %}
+                            <p class="lead">Once access is gained, attackers establish persistence to maintain their presence even if the initial access point is discovered and remediated.</p>
+                            
+                            <div class="row mt-4">
+                                <div class="col-md-6 mb-4">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-warning bg-opacity-10">
+                                            <h5 class="mb-0">Backdoor Installation</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p>Creating hidden access mechanisms that can be used to regain access.</p>
+                                            <ul>
+                                                <li>Web shells on compromised web servers</li>
+                                                <li>Custom remote access trojans (RATs)</li>
+                                                <li>Modification of existing services to include backdoor functionality</li>
+                                            </ul>
+                                        </div>
+                                        <div class="card-footer bg-transparent">
+                                            <small class="text-muted">Defense: File integrity monitoring, application whitelisting, outbound connection monitoring</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-warning bg-opacity-10">
+                                            <h5 class="mb-0">Credential Harvesting</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p>Gathering valid credentials to maintain access even if the malware is detected.</p>
+                                            <ul>
+                                                <li>Password hash dumping from memory</li>
+                                                <li>Keylogging and credential stealing malware</li>
+                                                <li>Exploitation of password storage mechanisms</li>
+                                            </ul>
+                                        </div>
+                                        <div class="card-footer bg-transparent">
+                                            <small class="text-muted">Defense: Multi-factor authentication, privileged access management, credential monitoring</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        {% elif phase == 'privilege_escalation' %}
+                            <p class="lead">After establishing persistence, attackers seek to gain higher-level permissions to access more sensitive systems and data.</p>
+                            
+                            <div class="row mt-4">
+                                <div class="col-md-6 mb-4">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-info bg-opacity-10">
+                                            <h5 class="mb-0">Permission Exploitation</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p>Exploiting weaknesses in permission models to gain elevated access.</p>
+                                            <ul>
+                                                <li>Misconfigured access control lists (ACLs)</li>
+                                                <li>Excessive user privileges or permission inheritance</li>
+                                                <li>Abuse of service accounts with elevated permissions</li>
+                                            </ul>
+                                        </div>
+                                        <div class="card-footer bg-transparent">
+                                            <small class="text-muted">Defense: Principle of least privilege, regular privilege audits, just-in-time access</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-info bg-opacity-10">
+                                            <h5 class="mb-0">Vulnerability Exploitation</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p>Exploiting known or zero-day vulnerabilities to gain elevated privileges.</p>
+                                            <ul>
+                                                <li>Kernel exploits and privilege escalation vulnerabilities</li>
+                                                <li>DLL hijacking and application-specific vulnerabilities</li>
+                                                <li>Manipulation of unpatched internal services</li>
+                                            </ul>
+                                        </div>
+                                        <div class="card-footer bg-transparent">
+                                            <small class="text-muted">Defense: Timely patching, vulnerability management, application sandboxing</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        {% elif phase == 'lateral_movement' %}
+                            <p class="lead">With elevated privileges, attackers move laterally across the network to expand their control and access to valuable assets.</p>
+                            
+                            <div class="row mt-4">
+                                <div class="col-md-6 mb-4">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-success bg-opacity-10">
+                                            <h5 class="mb-0">Internal Reconnaissance</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p>Mapping the internal network to identify valuable targets and movement paths.</p>
+                                            <ul>
+                                                <li>Network scanning and enumeration</li>
+                                                <li>Active Directory enumeration and trust mapping</li>
+                                                <li>Service discovery and vulnerability mapping</li>
+                                            </ul>
+                                        </div>
+                                        <div class="card-footer bg-transparent">
+                                            <small class="text-muted">Defense: Network segmentation, internal traffic monitoring, deception technology</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-success bg-opacity-10">
+                                            <h5 class="mb-0">Remote Service Exploitation</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p>Using compromised credentials or exploits to access other systems.</p>
+                                            <ul>
+                                                <li>Pass-the-hash and pass-the-ticket attacks</li>
+                                                <li>Remote execution via WMI, PowerShell, or PsExec</li>
+                                                <li>Exploitation of internal services (SMB, RDP, SSH)</li>
+                                            </ul>
+                                        </div>
+                                        <div class="card-footer bg-transparent">
+                                            <small class="text-muted">Defense: Network segmentation, credential security, lateral movement detection</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        {% else %}
+                            <p class="lead">The final phase involves locating and extracting sensitive data from the target environment.</p>
+                            
+                            <div class="row mt-4">
+                                <div class="col-md-6 mb-4">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-primary bg-opacity-10">
+                                            <h5 class="mb-0">Data Collection</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p>Identifying and collecting valuable data for extraction.</p>
+                                            <ul>
+                                                <li>Database dumping and mass file collection</li>
+                                                <li>Email archive access and sensitive document gathering</li>
+                                                <li>Selective targeting based on keywords or file types</li>
+                                            </ul>
+                                        </div>
+                                        <div class="card-footer bg-transparent">
+                                            <small class="text-muted">Defense: Data classification, encryption, access controls, data loss prevention</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-primary bg-opacity-10">
+                                            <h5 class="mb-0">Data Exfiltration</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p>Moving data out of the target environment through covert channels.</p>
+                                            <ul>
+                                                <li>DNS tunneling and encrypted web channels</li>
+                                                <li>Steganography and custom protocols</li>
+                                                <li>Scheduled transfers during low-monitoring periods</li>
+                                            </ul>
+                                        </div>
+                                        <div class="card-footer bg-transparent">
+                                            <small class="text-muted">Defense: Network monitoring, egress filtering, anomaly detection, DLP solutions</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                
+                <!-- Defense Strategies -->
+                <div class="card mb-4">
+                    <div class="card-header bg-success bg-opacity-10">
+                        <h4 class="mb-0">
+                            <i class="fas fa-shield-alt me-2"></i>Defense Strategies Against APTs
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header bg-success bg-opacity-10">
+                                        <h5 class="mb-0">Prevention</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item">
+                                                <i class="fas fa-check-circle me-2 text-success"></i>
+                                                <strong>Email Security</strong> - Advanced filtering, attachment sandboxing
+                                            </li>
+                                            <li class="list-group-item">
+                                                <i class="fas fa-check-circle me-2 text-success"></i>
+                                                <strong>Vulnerability Management</strong> - Regular patching and updates
+                                            </li>
+                                            <li class="list-group-item">
+                                                <i class="fas fa-check-circle me-2 text-success"></i>
+                                                <strong>Network Segmentation</strong> - Limit lateral movement potential
+                                            </li>
+                                            <li class="list-group-item">
+                                                <i class="fas fa-check-circle me-2 text-success"></i>
+                                                <strong>Access Controls</strong> - Least privilege principle implementation
+                                            </li>
+                                            <li class="list-group-item">
+                                                <i class="fas fa-check-circle me-2 text-success"></i>
+                                                <strong>User Awareness</strong> - Security training and phishing simulations
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header bg-info bg-opacity-10">
+                                        <h5 class="mb-0">Detection</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item">
+                                                <i class="fas fa-search me-2 text-info"></i>
+                                                <strong>Behavioral Analytics</strong> - Identify anomalous activities
+                                            </li>
+                                            <li class="list-group-item">
+                                                <i class="fas fa-search me-2 text-info"></i>
+                                                <strong>Network Monitoring</strong> - Analyze traffic patterns and data flows
+                                            </li>
+                                            <li class="list-group-item">
+                                                <i class="fas fa-search me-2 text-info"></i>
+                                                <strong>Endpoint Detection</strong> - Monitor for suspicious behavior
+                                            </li>
+                                            <li class="list-group-item">
+                                                <i class="fas fa-search me-2 text-info"></i>
+                                                <strong>Deception Technology</strong> - Deploy honeypots and decoys
+                                            </li>
+                                            <li class="list-group-item">
+                                                <i class="fas fa-search me-2 text-info"></i>
+                                                <strong>Threat Hunting</strong> - Proactively search for indicators of compromise
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header bg-warning bg-opacity-10">
+                                        <h5 class="mb-0">Response</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item">
+                                                <i class="fas fa-bolt me-2 text-warning"></i>
+                                                <strong>Incident Response Plan</strong> - Documented procedures for breaches
+                                            </li>
+                                            <li class="list-group-item">
+                                                <i class="fas fa-bolt me-2 text-warning"></i>
+                                                <strong>Forensic Analysis</strong> - Detailed examination of compromised systems
+                                            </li>
+                                            <li class="list-group-item">
+                                                <i class="fas fa-bolt me-2 text-warning"></i>
+                                                <strong>Containment Strategies</strong> - Isolate affected systems
+                                            </li>
+                                            <li class="list-group-item">
+                                                <i class="fas fa-bolt me-2 text-warning"></i>
+                                                <strong>Threat Intelligence</strong> - Utilize IOCs to identify affected areas
+                                            </li>
+                                            <li class="list-group-item">
+                                                <i class="fas fa-bolt me-2 text-warning"></i>
+                                                <strong>Recovery Procedures</strong> - Restore systems from known-good backups
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Additional Resources -->
+                <div class="card">
+                    <div class="card-header bg-secondary bg-opacity-10">
+                        <h4 class="mb-0">
+                            <i class="fas fa-external-link-alt me-2"></i>Additional Resources
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <i class="fas fa-books me-2"></i>MITRE ATT&CK Framework
+                                        </h5>
+                                        <p class="card-text">A globally-accessible knowledge base of adversary tactics and techniques based on real-world observations.</p>
+                                        <a href="https://attack.mitre.org/" target="_blank" class="btn btn-outline-primary">
+                                            <i class="fas fa-external-link-alt me-2"></i>Visit Resource
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <i class="fas fa-shield-alt me-2"></i>NIST Cybersecurity Framework
+                                        </h5>
+                                        <p class="card-text">Voluntary guidance based on existing standards, guidelines, and practices for organizations to better manage and reduce cybersecurity risk.</p>
+                                        <a href="https://www.nist.gov/cyberframework" target="_blank" class="btn btn-outline-primary">
+                                            <i class="fas fa-external-link-alt me-2"></i>Visit Resource
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

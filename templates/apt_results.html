@@ -1,0 +1,551 @@
+{% extends 'base.html' %}
+
+{% block title %}APT Simulation Results - Web App Penetration Testing Toolkit{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">
+                        <i class="fas fa-clipboard-list me-2"></i>APT Simulation Results
+                    </h2>
+                    <div>
+                        <a href="{{ url_for('apt_bp.apt_dashboard') }}" class="btn btn-sm btn-outline-secondary me-2">
+                            <i class="fas fa-arrow-left me-1"></i>Back to APT Dashboard
+                        </a>
+                        <a href="{{ url_for('reports_bp.view_report', report_id=report.id) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-file-alt me-1"></i>Standard Report View
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Executive Summary -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary bg-opacity-10">
+                        <h4 class="mb-0">Executive Summary</h4>
+                    </div>
+                    <div class="card-body">
+                        <p>{{ report.summary }}</p>
+                        
+                        <!-- Vulnerability Statistics -->
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <h5>Vulnerability Breakdown</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Severity</th>
+                                                <th>Count</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% set severity_counts = report.get_vulnerability_count_by_severity() %}
+                                            {% for severity in ['Critical', 'High', 'Medium', 'Low', 'Info'] %}
+                                                <tr>
+                                                    <td>
+                                                        <span class="badge 
+                                                            {% if severity == 'Critical' %}bg-danger
+                                                            {% elif severity == 'High' %}bg-warning text-dark
+                                                            {% elif severity == 'Medium' %}bg-info text-dark
+                                                            {% elif severity == 'Low' %}bg-success
+                                                            {% else %}bg-secondary{% endif %}">
+                                                            {{ severity }}
+                                                        </span>
+                                                    </td>
+                                                    <td>{{ severity_counts.get(severity, 0) }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                        <tfoot>
+                                            <tr class="table-active">
+                                                <th>Total</th>
+                                                <th>{{ report.vulnerabilities.count() }}</th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Attack Path Visualization</h5>
+                                <canvas id="attackPathVisualization" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- APT Kill Chain Findings -->
+                <div class="card mb-4">
+                    <div class="card-header bg-danger bg-opacity-10">
+                        <h4 class="mb-0">APT Kill Chain Analysis</h4>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-4">The following vulnerabilities were identified across the APT attack chain:</p>
+                        
+                        <!-- Initial Access Phase -->
+                        <div class="card mb-4 border-danger">
+                            <div class="card-header bg-danger bg-opacity-10">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-door-open me-2"></i>Initial Access Phase
+                                    </h5>
+                                    <span class="badge bg-danger">{{ phases.initial_access|length }} Findings</span>
+                                </div>
+                            </div>
+                            {% if phases.initial_access %}
+                                <div class="list-group list-group-flush">
+                                    {% for vuln in phases.initial_access %}
+                                        <div class="list-group-item">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h5 class="mb-1">{{ vuln.type }}</h5>
+                                                <span class="badge 
+                                                    {% if vuln.severity == 'Critical' %}bg-danger
+                                                    {% elif vuln.severity == 'High' %}bg-warning text-dark
+                                                    {% elif vuln.severity == 'Medium' %}bg-info text-dark
+                                                    {% elif vuln.severity == 'Low' %}bg-success
+                                                    {% else %}bg-secondary{% endif %}">
+                                                    {{ vuln.severity }}
+                                                </span>
+                                            </div>
+                                            <p class="mb-1">{{ vuln.description }}</p>
+                                            <small>
+                                                <strong>Location:</strong> {{ vuln.location }}
+                                            </small>
+                                            <div class="mt-2">
+                                                <button class="btn btn-sm btn-outline-secondary" type="button" 
+                                                        data-bs-toggle="collapse" data-bs-target="#collapse-{{ vuln.id }}">
+                                                    Show Details
+                                                </button>
+                                                <div class="collapse mt-2" id="collapse-{{ vuln.id }}">
+                                                    <div class="card card-body">
+                                                        <h6>Proof of Concept</h6>
+                                                        <pre class="bg-dark text-light p-2 rounded"><code>{{ vuln.proof }}</code></pre>
+                                                        
+                                                        <h6>Recommended Remediation</h6>
+                                                        <p>{{ vuln.remediation }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="card-body">
+                                    <div class="alert alert-success mb-0">
+                                        <i class="fas fa-check-circle me-2"></i>No vulnerabilities found in this phase.
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Persistence Phase -->
+                        <div class="card mb-4 border-warning">
+                            <div class="card-header bg-warning bg-opacity-10">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-plug me-2"></i>Persistence Phase
+                                    </h5>
+                                    <span class="badge bg-warning text-dark">{{ phases.persistence|length }} Findings</span>
+                                </div>
+                            </div>
+                            {% if phases.persistence %}
+                                <div class="list-group list-group-flush">
+                                    {% for vuln in phases.persistence %}
+                                        <div class="list-group-item">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h5 class="mb-1">{{ vuln.type }}</h5>
+                                                <span class="badge 
+                                                    {% if vuln.severity == 'Critical' %}bg-danger
+                                                    {% elif vuln.severity == 'High' %}bg-warning text-dark
+                                                    {% elif vuln.severity == 'Medium' %}bg-info text-dark
+                                                    {% elif vuln.severity == 'Low' %}bg-success
+                                                    {% else %}bg-secondary{% endif %}">
+                                                    {{ vuln.severity }}
+                                                </span>
+                                            </div>
+                                            <p class="mb-1">{{ vuln.description }}</p>
+                                            <small>
+                                                <strong>Location:</strong> {{ vuln.location }}
+                                            </small>
+                                            <div class="mt-2">
+                                                <button class="btn btn-sm btn-outline-secondary" type="button" 
+                                                        data-bs-toggle="collapse" data-bs-target="#collapse-{{ vuln.id }}">
+                                                    Show Details
+                                                </button>
+                                                <div class="collapse mt-2" id="collapse-{{ vuln.id }}">
+                                                    <div class="card card-body">
+                                                        <h6>Proof of Concept</h6>
+                                                        <pre class="bg-dark text-light p-2 rounded"><code>{{ vuln.proof }}</code></pre>
+                                                        
+                                                        <h6>Recommended Remediation</h6>
+                                                        <p>{{ vuln.remediation }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="card-body">
+                                    <div class="alert alert-success mb-0">
+                                        <i class="fas fa-check-circle me-2"></i>No vulnerabilities found in this phase.
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Privilege Escalation Phase -->
+                        <div class="card mb-4 border-info">
+                            <div class="card-header bg-info bg-opacity-10">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-level-up-alt me-2"></i>Privilege Escalation Phase
+                                    </h5>
+                                    <span class="badge bg-info">{{ phases.privilege_escalation|length }} Findings</span>
+                                </div>
+                            </div>
+                            {% if phases.privilege_escalation %}
+                                <div class="list-group list-group-flush">
+                                    {% for vuln in phases.privilege_escalation %}
+                                        <div class="list-group-item">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h5 class="mb-1">{{ vuln.type }}</h5>
+                                                <span class="badge 
+                                                    {% if vuln.severity == 'Critical' %}bg-danger
+                                                    {% elif vuln.severity == 'High' %}bg-warning text-dark
+                                                    {% elif vuln.severity == 'Medium' %}bg-info text-dark
+                                                    {% elif vuln.severity == 'Low' %}bg-success
+                                                    {% else %}bg-secondary{% endif %}">
+                                                    {{ vuln.severity }}
+                                                </span>
+                                            </div>
+                                            <p class="mb-1">{{ vuln.description }}</p>
+                                            <small>
+                                                <strong>Location:</strong> {{ vuln.location }}
+                                            </small>
+                                            <div class="mt-2">
+                                                <button class="btn btn-sm btn-outline-secondary" type="button" 
+                                                        data-bs-toggle="collapse" data-bs-target="#collapse-{{ vuln.id }}">
+                                                    Show Details
+                                                </button>
+                                                <div class="collapse mt-2" id="collapse-{{ vuln.id }}">
+                                                    <div class="card card-body">
+                                                        <h6>Proof of Concept</h6>
+                                                        <pre class="bg-dark text-light p-2 rounded"><code>{{ vuln.proof }}</code></pre>
+                                                        
+                                                        <h6>Recommended Remediation</h6>
+                                                        <p>{{ vuln.remediation }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="card-body">
+                                    <div class="alert alert-success mb-0">
+                                        <i class="fas fa-check-circle me-2"></i>No vulnerabilities found in this phase.
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Lateral Movement Phase -->
+                        <div class="card mb-4 border-success">
+                            <div class="card-header bg-success bg-opacity-10">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-network-wired me-2"></i>Lateral Movement Phase
+                                    </h5>
+                                    <span class="badge bg-success">{{ phases.lateral_movement|length }} Findings</span>
+                                </div>
+                            </div>
+                            {% if phases.lateral_movement %}
+                                <div class="list-group list-group-flush">
+                                    {% for vuln in phases.lateral_movement %}
+                                        <div class="list-group-item">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h5 class="mb-1">{{ vuln.type }}</h5>
+                                                <span class="badge 
+                                                    {% if vuln.severity == 'Critical' %}bg-danger
+                                                    {% elif vuln.severity == 'High' %}bg-warning text-dark
+                                                    {% elif vuln.severity == 'Medium' %}bg-info text-dark
+                                                    {% elif vuln.severity == 'Low' %}bg-success
+                                                    {% else %}bg-secondary{% endif %}">
+                                                    {{ vuln.severity }}
+                                                </span>
+                                            </div>
+                                            <p class="mb-1">{{ vuln.description }}</p>
+                                            <small>
+                                                <strong>Location:</strong> {{ vuln.location }}
+                                            </small>
+                                            <div class="mt-2">
+                                                <button class="btn btn-sm btn-outline-secondary" type="button" 
+                                                        data-bs-toggle="collapse" data-bs-target="#collapse-{{ vuln.id }}">
+                                                    Show Details
+                                                </button>
+                                                <div class="collapse mt-2" id="collapse-{{ vuln.id }}">
+                                                    <div class="card card-body">
+                                                        <h6>Proof of Concept</h6>
+                                                        <pre class="bg-dark text-light p-2 rounded"><code>{{ vuln.proof }}</code></pre>
+                                                        
+                                                        <h6>Recommended Remediation</h6>
+                                                        <p>{{ vuln.remediation }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="card-body">
+                                    <div class="alert alert-success mb-0">
+                                        <i class="fas fa-check-circle me-2"></i>No vulnerabilities found in this phase.
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Data Exfiltration Phase -->
+                        <div class="card mb-4 border-primary">
+                            <div class="card-header bg-primary bg-opacity-10">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-file-export me-2"></i>Data Exfiltration Phase
+                                    </h5>
+                                    <span class="badge bg-primary">{{ phases.data_exfiltration|length }} Findings</span>
+                                </div>
+                            </div>
+                            {% if phases.data_exfiltration %}
+                                <div class="list-group list-group-flush">
+                                    {% for vuln in phases.data_exfiltration %}
+                                        <div class="list-group-item">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h5 class="mb-1">{{ vuln.type }}</h5>
+                                                <span class="badge 
+                                                    {% if vuln.severity == 'Critical' %}bg-danger
+                                                    {% elif vuln.severity == 'High' %}bg-warning text-dark
+                                                    {% elif vuln.severity == 'Medium' %}bg-info text-dark
+                                                    {% elif vuln.severity == 'Low' %}bg-success
+                                                    {% else %}bg-secondary{% endif %}">
+                                                    {{ vuln.severity }}
+                                                </span>
+                                            </div>
+                                            <p class="mb-1">{{ vuln.description }}</p>
+                                            <small>
+                                                <strong>Location:</strong> {{ vuln.location }}
+                                            </small>
+                                            <div class="mt-2">
+                                                <button class="btn btn-sm btn-outline-secondary" type="button" 
+                                                        data-bs-toggle="collapse" data-bs-target="#collapse-{{ vuln.id }}">
+                                                    Show Details
+                                                </button>
+                                                <div class="collapse mt-2" id="collapse-{{ vuln.id }}">
+                                                    <div class="card card-body">
+                                                        <h6>Proof of Concept</h6>
+                                                        <pre class="bg-dark text-light p-2 rounded"><code>{{ vuln.proof }}</code></pre>
+                                                        
+                                                        <h6>Recommended Remediation</h6>
+                                                        <p>{{ vuln.remediation }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="card-body">
+                                    <div class="alert alert-success mb-0">
+                                        <i class="fas fa-check-circle me-2"></i>No vulnerabilities found in this phase.
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Other Vulnerabilities -->
+                        {% if other_vulnerabilities %}
+                            <div class="card mb-4 border-secondary">
+                                <div class="card-header bg-secondary bg-opacity-10">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-exclamation-triangle me-2"></i>Other Vulnerabilities
+                                        </h5>
+                                        <span class="badge bg-secondary">{{ other_vulnerabilities|length }} Findings</span>
+                                    </div>
+                                </div>
+                                <div class="list-group list-group-flush">
+                                    {% for vuln in other_vulnerabilities %}
+                                        <div class="list-group-item">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h5 class="mb-1">{{ vuln.type }}</h5>
+                                                <span class="badge 
+                                                    {% if vuln.severity == 'Critical' %}bg-danger
+                                                    {% elif vuln.severity == 'High' %}bg-warning text-dark
+                                                    {% elif vuln.severity == 'Medium' %}bg-info text-dark
+                                                    {% elif vuln.severity == 'Low' %}bg-success
+                                                    {% else %}bg-secondary{% endif %}">
+                                                    {{ vuln.severity }}
+                                                </span>
+                                            </div>
+                                            <p class="mb-1">{{ vuln.description }}</p>
+                                            <small>
+                                                <strong>Location:</strong> {{ vuln.location }}
+                                            </small>
+                                            <div class="mt-2">
+                                                <button class="btn btn-sm btn-outline-secondary" type="button" 
+                                                        data-bs-toggle="collapse" data-bs-target="#collapse-{{ vuln.id }}">
+                                                    Show Details
+                                                </button>
+                                                <div class="collapse mt-2" id="collapse-{{ vuln.id }}">
+                                                    <div class="card card-body">
+                                                        <h6>Proof of Concept</h6>
+                                                        <pre class="bg-dark text-light p-2 rounded"><code>{{ vuln.proof }}</code></pre>
+                                                        
+                                                        <h6>Recommended Remediation</h6>
+                                                        <p>{{ vuln.remediation }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Strategic Recommendations -->
+                <div class="card mb-4">
+                    <div class="card-header bg-success bg-opacity-10">
+                        <h4 class="mb-0">Strategic Recommendations</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <h5>Short-Term Actions</h5>
+                                <ul class="list-group">
+                                    <li class="list-group-item">
+                                        <i class="fas fa-shield-alt me-2 text-danger"></i>
+                                        <strong>Address Critical Vulnerabilities</strong>
+                                        <p class="text-muted mb-0 mt-1">Prioritize fixing all critical and high severity issues identified in this report.</p>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <i class="fas fa-user-shield me-2 text-warning"></i>
+                                        <strong>Implement Improved Authentication</strong>
+                                        <p class="text-muted mb-0 mt-1">Add multi-factor authentication for all privileged accounts.</p>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <i class="fas fa-network-wired me-2 text-info"></i>
+                                        <strong>Review Network Segmentation</strong>
+                                        <p class="text-muted mb-0 mt-1">Evaluate network boundaries and implement proper segmentation to limit lateral movement.</p>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <h5>Long-Term Strategy</h5>
+                                <ul class="list-group">
+                                    <li class="list-group-item">
+                                        <i class="fas fa-chart-line me-2 text-primary"></i>
+                                        <strong>Continuous Security Monitoring</strong>
+                                        <p class="text-muted mb-0 mt-1">Implement a SIEM solution with behavioral analytics to detect APT activities.</p>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <i class="fas fa-users-cog me-2 text-success"></i>
+                                        <strong>Security Awareness Training</strong>
+                                        <p class="text-muted mb-0 mt-1">Conduct regular training sessions on recognizing and responding to advanced threats.</p>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <i class="fas fa-clipboard-check me-2 text-secondary"></i>
+                                        <strong>Regular Security Assessments</strong>
+                                        <p class="text-muted mb-0 mt-1">Schedule periodic APT simulations and penetration tests to validate security controls.</p>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="{{ url_for('reports_bp.download_report', report_id=report.id) }}" class="btn btn-primary">
+                        <i class="fas fa-download me-2"></i>Download Full Report
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Prepare data for attack path visualization
+        const phaseData = {
+            labels: ['Initial Access', 'Persistence', 'Privilege Escalation', 'Lateral Movement', 'Data Exfiltration'],
+            datasets: [{
+                label: 'Vulnerabilities by Phase',
+                data: [
+                    {{ phases.initial_access|length }},
+                    {{ phases.persistence|length }},
+                    {{ phases.privilege_escalation|length }},
+                    {{ phases.lateral_movement|length }},
+                    {{ phases.data_exfiltration|length }}
+                ],
+                backgroundColor: [
+                    'rgba(220, 53, 69, 0.7)',    // Danger (Initial Access)
+                    'rgba(255, 193, 7, 0.7)',    // Warning (Persistence)
+                    'rgba(13, 202, 240, 0.7)',   // Info (Privilege Escalation)
+                    'rgba(40, 167, 69, 0.7)',    // Success (Lateral Movement)
+                    'rgba(13, 110, 253, 0.7)'    // Primary (Data Exfiltration)
+                ],
+                borderColor: [
+                    'rgb(220, 53, 69)',
+                    'rgb(255, 193, 7)',
+                    'rgb(13, 202, 240)',
+                    'rgb(40, 167, 69)',
+                    'rgb(13, 110, 253)'
+                ],
+                borderWidth: 1
+            }]
+        };
+        
+        // Create attack path visualization
+        const attackPathCtx = document.getElementById('attackPathVisualization').getContext('2d');
+        new Chart(attackPathCtx, {
+            type: 'radar',
+            data: phaseData,
+            options: {
+                elements: {
+                    line: {
+                        borderWidth: 3
+                    }
+                },
+                scale: {
+                    min: 0
+                },
+                scales: {
+                    r: {
+                        ticks: {
+                            stepSize: 1,
+                            beginAtZero: true
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label}: ${context.parsed.r}`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
