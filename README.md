@@ -1,10 +1,10 @@
-# Web Application Penetration Testing Toolkit
+# AegisX - Advanced Web Security Testing Platform
 
-A comprehensive toolkit for identifying web application vulnerabilities, malware, and security weaknesses with actionable reporting.
+A comprehensive security platform for identifying web application vulnerabilities, malware, and security weaknesses with actionable reporting.
 
 ## Overview
 
-The Web Application Penetration Testing Toolkit is an advanced security assessment platform designed to help security professionals identify and address vulnerabilities in web applications. The toolkit combines multiple specialized modules to provide a complete security assessment solution.
+AegisX is an advanced security assessment platform designed to help security professionals identify and address vulnerabilities in web applications. Named after the shield of Zeus in Greek mythology, AegisX provides powerful protection through multiple specialized modules that form a complete security assessment solution.
 
 ## Key Features
 
@@ -53,7 +53,7 @@ The Web Application Penetration Testing Toolkit is an advanced security assessme
 1. Clone the repository
 ```bash
 git clone <repository-url>
-cd web-app-pentest-toolkit
+cd aegisx
 ```
 
 2. Install dependencies
@@ -76,7 +76,7 @@ gunicorn --bind 0.0.0.0:5000 main:app
 ## Usage
 
 ### Basic Scanning
-1. Navigate to the dashboard
+1. Navigate to the AegisX dashboard
 2. Click "New Scan"
 3. Enter the target URL and select modules to run
 4. View results in the Reports section
@@ -101,7 +101,7 @@ gunicorn --bind 0.0.0.0:5000 main:app
 
 ## Architecture
 
-The toolkit is built with a modular architecture:
+AegisX is built with a modular architecture:
 - **Core Engine**: Coordinates scanning and analysis modules
 - **Scanner Modules**: Individual modules for various vulnerability types
 - **Specialized Modules**: Advanced analysis capabilities (PQC, APT, Malware)
@@ -110,7 +110,7 @@ The toolkit is built with a modular architecture:
 
 ## Security Considerations
 
-This toolkit is designed for authorized security testing only. Always ensure you have proper permission before scanning any website or system.
+AegisX is designed for authorized security testing only. Always ensure you have proper permission before scanning any website or system.
 
 ## License
 
