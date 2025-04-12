@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+
+{% block title %}Post-Quantum Cryptography - Web App Penetration Testing Toolkit{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">
+                        <i class="fas fa-shield-alt me-2"></i>Post-Quantum Cryptography
+                    </h2>
+                    <div class="btn-group">
+                        <a href="{{ url_for('pqc_bp.pqc_demo') }}" class="btn btn-primary">
+                            <i class="fas fa-flask me-2"></i>Algorithm Demo
+                        </a>
+                        <a href="{{ url_for('pqc_bp.pqc_compare') }}" class="btn btn-info">
+                            <i class="fas fa-balance-scale me-2"></i>Compare Algorithms
+                        </a>
+                        <a href="{{ url_for('pqc_bp.pqc_scan_form') }}" class="btn btn-success">
+                            <i class="fas fa-search me-2"></i>PQC-Specific Scan
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Quantum Computing Threat:</strong> When sufficiently powerful quantum computers become available, they will be able to break many of the cryptographic systems currently in use, particularly those based on factoring (RSA) and discrete logarithm problems (ECC). Post-quantum cryptography uses alternative mathematical approaches to resist quantum attacks.
+                </div>
+                
+                <h4 class="mb-3">Understanding Post-Quantum Cryptography</h4>
+                <p>Post-Quantum Cryptography (PQC) refers to cryptographic algorithms that are believed to be secure against an attack by a quantum computer. The need for such algorithms arises from the fact that quantum computers would be able to easily break most of our current cryptographic primitives, including:</p>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5 class="text-danger">Vulnerable to Quantum Attacks:</h5>
+                        <ul class="list-group">
+                            <li class="list-group-item bg-danger bg-opacity-10">
+                                <strong>RSA</strong>: Based on the difficulty of factoring large numbers
+                            </li>
+                            <li class="list-group-item bg-danger bg-opacity-10">
+                                <strong>DSA</strong>: Based on the discrete logarithm problem
+                            </li>
+                            <li class="list-group-item bg-danger bg-opacity-10">
+                                <strong>ECDSA/ECDH</strong>: Based on elliptic curve discrete logarithm problem
+                            </li>
+                            <li class="list-group-item bg-danger bg-opacity-10">
+                                <strong>Diffie-Hellman</strong>: Key exchange based on discrete logarithm problem
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="text-success">Quantum-Resistant Approaches:</h5>
+                        <ul class="list-group">
+                            <li class="list-group-item bg-success bg-opacity-10">
+                                <strong>Lattice-based</strong>: Based on the hardness of lattice problems (e.g., Kyber, Dilithium)
+                            </li>
+                            <li class="list-group-item bg-success bg-opacity-10">
+                                <strong>Hash-based</strong>: Based solely on the security of hash functions (e.g., SPHINCS+)
+                            </li>
+                            <li class="list-group-item bg-success bg-opacity-10">
+                                <strong>Code-based</strong>: Based on error-correcting codes (e.g., Classic McEliece)
+                            </li>
+                            <li class="list-group-item bg-success bg-opacity-10">
+                                <strong>Multivariate</strong>: Based on the difficulty of solving systems of multivariate equations
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recommendations Section -->
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <h4 class="mb-0">
+                    <i class="fas fa-lightbulb me-2"></i>PQC Implementation Recommendations
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for category, details in recommendations.items() %}
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="mb-0">{{ category | title }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Recommended:</strong> {{ details.recommended | join(', ') }}</p>
+                                <p>{{ details.description }}</p>
+                                <p><strong>Key Sizes:</strong> {{ details.key_sizes }}</p>
+                                <p class="text-muted mb-0"><strong>Implementation Notes:</strong> {{ details.implementation_notes }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hybrid Approach Section -->
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <h4 class="mb-0">
+                    <i class="fas fa-puzzle-piece me-2"></i>{{ hybrid_recommendation.title }}
+                </h4>
+            </div>
+            <div class="card-body">
+                <p>{{ hybrid_recommendation.description }}</p>
+                
+                <h5>Benefits</h5>
+                <ul>
+                    {% for benefit in hybrid_recommendation.benefits %}
+                    <li>{{ benefit }}</li>
+                    {% endfor %}
+                </ul>
+                
+                <h5>Recommended Implementation</h5>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Operation</th>
+                                <th>Hybrid Approach</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Key Exchange</td>
+                                <td>{{ hybrid_recommendation.implementation.key_exchange }}</td>
+                            </tr>
+                            <tr>
+                                <td>Signatures</td>
+                                <td>{{ hybrid_recommendation.implementation.signatures }}</td>
+                            </tr>
+                            <tr>
+                                <td>Symmetric Encryption</td>
+                                <td>{{ hybrid_recommendation.implementation.symmetric }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h5>Example Code</h5>
+                <pre class="bg-dark text-white p-3 rounded"><code>{{ hybrid_recommendation.implementation.code_example }}</code></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Resources Section -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <h4 class="mb-0">
+                    <i class="fas fa-book me-2"></i>Additional Resources
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Standards & Research</h5>
+                        <ul>
+                            <li><a href="https://csrc.nist.gov/Projects/post-quantum-cryptography" target="_blank">NIST Post-Quantum Cryptography Standardization</a></li>
+                            <li><a href="https://openquantumsafe.org/" target="_blank">Open Quantum Safe Project</a></li>
+                            <li><a href="https://pq-crystals.org/" target="_blank">CRYSTALS (Kyber & Dilithium)</a></li>
+                            <li><a href="https://sphincs.org/" target="_blank">SPHINCS+ Hash-based Signatures</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Practical Implementations</h5>
+                        <ul>
+                            <li><a href="https://github.com/open-quantum-safe/liboqs" target="_blank">liboqs: C library for quantum-resistant cryptography</a></li>
+                            <li><a href="https://github.com/open-quantum-safe/liboqs-python" target="_blank">Python bindings for liboqs</a></li>
+                            <li><a href="https://github.com/open-quantum-safe/oqs-provider" target="_blank">OQS OpenSSL Provider</a></li>
+                            <li><a href="https://github.com/cloudflare/circl" target="_blank">Cloudflare's CIRCL Cryptographic Library</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

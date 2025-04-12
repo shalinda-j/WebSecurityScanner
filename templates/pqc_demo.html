@@ -1,0 +1,346 @@
+{% extends 'base.html' %}
+
+{% block title %}Post-Quantum Cryptography Demo - Web App Penetration Testing Toolkit{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">
+                        <i class="fas fa-flask me-2"></i>PQC Algorithm Demonstration
+                    </h2>
+                    <a href="{{ url_for('pqc_bp.pqc_dashboard') }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Back to PQC Dashboard
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    This demonstration simulates the operation of post-quantum cryptographic algorithms. It shows how these algorithms can be used to secure data against quantum computing attacks.
+                </div>
+                
+                <form method="post" action="{{ url_for('pqc_bp.pqc_demo') }}" class="mb-4">
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-play me-2"></i>Run PQC Algorithm Demonstration
+                        </button>
+                    </div>
+                </form>
+                
+                {% if results %}
+                    <h4 class="mb-3">Demonstration Results</h4>
+                    <div class="row">
+                        {% for algo_name, algo_result in results.items() %}
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100 {% if algo_result.success %}border-success{% else %}border-danger{% endif %}">
+                                    <div class="card-header {% if algo_result.success %}bg-success bg-opacity-10{% else %}bg-danger bg-opacity-10{% endif %}">
+                                        <h5 class="mb-0">{{ algo_name | title }}</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        {% if algo_result.success %}
+                                            <div class="alert alert-success">
+                                                <i class="fas fa-check-circle me-2"></i>
+                                                Algorithm demonstration successful
+                                            </div>
+                                            
+                                            <h6>Performance Metrics</h6>
+                                            <p><strong>Execution Time:</strong> {{ algo_result.execution_time_ms }} ms</p>
+                                            
+                                            <h6>Security Level</h6>
+                                            <p>{{ algo_result.security_level }}</p>
+                                            
+                                            {% if algo_result.key_sizes %}
+                                                <h6>Key/Data Sizes</h6>
+                                                <ul class="mb-0">
+                                                    {% for key, value in algo_result.key_sizes.items() %}
+                                                        <li><strong>{{ key | title }}:</strong> {{ value }} bytes</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            {% endif %}
+                                        {% else %}
+                                            <div class="alert alert-danger">
+                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                Algorithm demonstration failed
+                                            </div>
+                                            <p><strong>Error:</strong> {{ algo_result.error }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header bg-transparent">
+                            <h5 class="mb-0">Performance Comparison</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="performanceChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header bg-transparent">
+                            <h5 class="mb-0">Key Size Comparison</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="keySizeChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Algorithm Information -->
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <h4 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>About the Algorithms
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="accordion" id="algorithmAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingKyber">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseKyber" aria-expanded="false" aria-controls="collapseKyber">
+                                Kyber (Lattice-based Key Encapsulation Mechanism)
+                            </button>
+                        </h2>
+                        <div id="collapseKyber" class="accordion-collapse collapse" aria-labelledby="headingKyber" data-bs-parent="#algorithmAccordion">
+                            <div class="accordion-body">
+                                <p>Kyber is a lattice-based key encapsulation mechanism (KEM) selected by NIST for standardization in the post-quantum cryptography competition. It's based on the hardness of the Module Learning With Errors (MLWE) problem.</p>
+                                
+                                <h6>Key Features:</h6>
+                                <ul>
+                                    <li>Designed for efficient key exchange</li>
+                                    <li>Available in multiple security levels: Kyber-512, Kyber-768, and Kyber-1024</li>
+                                    <li>Offers a good balance between security, key size, and performance</li>
+                                    <li>Selected as the primary KEM for NIST's post-quantum cryptography standards</li>
+                                </ul>
+                                
+                                <h6>Typical Usage:</h6>
+                                <p>Key exchange for establishing shared secrets that can then be used for symmetric encryption.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingDilithium">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDilithium" aria-expanded="false" aria-controls="collapseDilithium">
+                                Dilithium (Lattice-based Digital Signature Algorithm)
+                            </button>
+                        </h2>
+                        <div id="collapseDilithium" class="accordion-collapse collapse" aria-labelledby="headingDilithium" data-bs-parent="#algorithmAccordion">
+                            <div class="accordion-body">
+                                <p>Dilithium is a lattice-based digital signature scheme selected by NIST for standardization. It's based on the hardness of the Module Learning With Errors (MLWE) and Short Integer Solution (SIS) problems.</p>
+                                
+                                <h6>Key Features:</h6>
+                                <ul>
+                                    <li>Designed for digital signatures</li>
+                                    <li>Available in multiple security levels: Dilithium2, Dilithium3, and Dilithium5</li>
+                                    <li>Offers a good balance between security, signature size, and performance</li>
+                                    <li>Selected as a primary signature scheme for NIST's post-quantum cryptography standards</li>
+                                </ul>
+                                
+                                <h6>Typical Usage:</h6>
+                                <p>Digital signatures for authentication, document signing, and code signing.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingFalcon">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFalcon" aria-expanded="false" aria-controls="collapseFalcon">
+                                Falcon (Lattice-based Digital Signature Algorithm)
+                            </button>
+                        </h2>
+                        <div id="collapseFalcon" class="accordion-collapse collapse" aria-labelledby="headingFalcon" data-bs-parent="#algorithmAccordion">
+                            <div class="accordion-body">
+                                <p>Falcon is another lattice-based digital signature scheme selected by NIST for standardization. It's based on the hardness of NTRU lattices and uses a different approach than Dilithium.</p>
+                                
+                                <h6>Key Features:</h6>
+                                <ul>
+                                    <li>More compact signatures than Dilithium, but more complex implementation</li>
+                                    <li>Available in security levels Falcon-512 and Falcon-1024</li>
+                                    <li>Offers excellent performance in terms of signature size</li>
+                                    <li>Selected as an alternative signature scheme for NIST's post-quantum cryptography standards</li>
+                                </ul>
+                                
+                                <h6>Typical Usage:</h6>
+                                <p>Digital signatures where minimizing signature size is important, such as in constrained environments.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingSPHINCS">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSPHINCS" aria-expanded="false" aria-controls="collapseSPHINCS">
+                                SPHINCS+ (Hash-based Digital Signature Algorithm)
+                            </button>
+                        </h2>
+                        <div id="collapseSPHINCS" class="accordion-collapse collapse" aria-labelledby="headingSPHINCS" data-bs-parent="#algorithmAccordion">
+                            <div class="accordion-body">
+                                <p>SPHINCS+ is a stateless hash-based signature scheme selected by NIST for standardization. Unlike lattice-based schemes, its security relies solely on the security of the underlying hash functions.</p>
+                                
+                                <h6>Key Features:</h6>
+                                <ul>
+                                    <li>Conservative security assumptions, based on well-understood hash functions</li>
+                                    <li>Stateless design (no need to maintain state between signatures)</li>
+                                    <li>Larger signatures compared to lattice-based schemes</li>
+                                    <li>Selected as an alternative signature scheme for NIST's post-quantum cryptography standards</li>
+                                </ul>
+                                
+                                <h6>Typical Usage:</h6>
+                                <p>Digital signatures where security is the primary concern, and signature size is less important. Often used in scenarios requiring high assurance.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if results %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Performance Chart
+    const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+    const algorithmNames = [];
+    const executionTimes = [];
+    
+    {% for algo_name, algo_result in results.items() %}
+        {% if algo_result.success %}
+            algorithmNames.push('{{ algo_name | title }}');
+            executionTimes.push({{ algo_result.execution_time_ms }});
+        {% endif %}
+    {% endfor %}
+    
+    new Chart(performanceCtx, {
+        type: 'bar',
+        data: {
+            labels: algorithmNames,
+            datasets: [{
+                label: 'Execution Time (ms)',
+                data: executionTimes,
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.5)',
+                    'rgba(255, 99, 132, 0.5)',
+                    'rgba(75, 192, 192, 0.5)',
+                    'rgba(255, 206, 86, 0.5)'
+                ],
+                borderColor: [
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(255, 206, 86, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Milliseconds (lower is better)'
+                    }
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Algorithm Performance Comparison'
+                }
+            }
+        }
+    });
+    
+    // Key Size Chart
+    const keySizeCtx = document.getElementById('keySizeChart').getContext('2d');
+    const keySizeData = {
+        labels: [],
+        datasets: []
+    };
+    
+    const keySizeTypes = new Set();
+    const algoNames = new Set();
+    const keySizeValues = {};
+    
+    {% for algo_name, algo_result in results.items() %}
+        {% if algo_result.success and algo_result.key_sizes %}
+            algoNames.add('{{ algo_name | title }}');
+            {% for key_type, size in algo_result.key_sizes.items() %}
+                keySizeTypes.add('{{ key_type }}');
+                if (!keySizeValues['{{ key_type }}']) {
+                    keySizeValues['{{ key_type }}'] = {};
+                }
+                keySizeValues['{{ key_type }}']['{{ algo_name | title }}'] = {{ size }};
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+    
+    // Convert sets to arrays
+    keySizeData.labels = Array.from(algoNames);
+    
+    // Colors for different key types
+    const colors = [
+        { bg: 'rgba(54, 162, 235, 0.5)', border: 'rgba(54, 162, 235, 1)' },
+        { bg: 'rgba(255, 99, 132, 0.5)', border: 'rgba(255, 99, 132, 1)' },
+        { bg: 'rgba(75, 192, 192, 0.5)', border: 'rgba(75, 192, 192, 1)' },
+        { bg: 'rgba(255, 206, 86, 0.5)', border: 'rgba(255, 206, 86, 1)' }
+    ];
+    
+    // Create datasets
+    let colorIndex = 0;
+    for (const keyType of Array.from(keySizeTypes)) {
+        const data = keySizeData.labels.map(algo => keySizeValues[keyType][algo] || 0);
+        
+        keySizeData.datasets.push({
+            label: keyType.charAt(0).toUpperCase() + keyType.slice(1),
+            data: data,
+            backgroundColor: colors[colorIndex % colors.length].bg,
+            borderColor: colors[colorIndex % colors.length].border,
+            borderWidth: 1
+        });
+        
+        colorIndex++;
+    }
+    
+    new Chart(keySizeCtx, {
+        type: 'bar',
+        data: keySizeData,
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Size (bytes)'
+                    }
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Key/Data Size Comparison'
+                }
+            }
+        }
+    });
+});
+</script>
+{% endif %}
+{% endblock %}

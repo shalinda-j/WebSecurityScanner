@@ -1,0 +1,380 @@
+{% extends 'base.html' %}
+
+{% block title %}PQC Algorithm Comparison - Web App Penetration Testing Toolkit{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">
+                        <i class="fas fa-balance-scale me-2"></i>Classical vs. Post-Quantum Cryptography
+                    </h2>
+                    <a href="{{ url_for('pqc_bp.pqc_dashboard') }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Back to PQC Dashboard
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    This page compares classical cryptographic algorithms with their post-quantum counterparts, highlighting key differences in security, performance, and practical considerations.
+                </div>
+                
+                <!-- Key Exchange Comparison -->
+                <h4 class="mb-3">Key Exchange/Encapsulation Mechanisms</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Algorithm</th>
+                                <th>Type</th>
+                                <th>Security Level</th>
+                                <th>Quantum Resistance</th>
+                                <th>Key Size</th>
+                                <th>Performance</th>
+                                <th>Standardization</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for algo in comparison_data.key_exchange %}
+                                <tr class="{% if algo.type == 'Classical' %}table-danger{% else %}table-success{% endif %}">
+                                    <td><strong>{{ algo.algorithm }}</strong></td>
+                                    <td>{{ algo.type }}</td>
+                                    <td>{{ algo.security_level }}</td>
+                                    <td>{{ algo.quantum_resistance }}</td>
+                                    <td>{{ algo.key_size }}</td>
+                                    <td>{{ algo.performance }}</td>
+                                    <td>{{ algo.standardization }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Signature Comparison -->
+                <h4 class="mt-5 mb-3">Digital Signature Algorithms</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Algorithm</th>
+                                <th>Type</th>
+                                <th>Security Level</th>
+                                <th>Quantum Resistance</th>
+                                <th>Signature Size</th>
+                                <th>Performance</th>
+                                <th>Standardization</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for algo in comparison_data.signatures %}
+                                <tr class="{% if algo.type == 'Classical' %}table-danger{% else %}table-success{% endif %}">
+                                    <td><strong>{{ algo.algorithm }}</strong></td>
+                                    <td>{{ algo.type }}</td>
+                                    <td>{{ algo.security_level }}</td>
+                                    <td>{{ algo.quantum_resistance }}</td>
+                                    <td>{{ algo.signature_size }}</td>
+                                    <td>{{ algo.performance }}</td>
+                                    <td>{{ algo.standardization }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Visual Comparison -->
+                <div class="row mt-5">
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header bg-transparent">
+                                <h5 class="mb-0">Key Size Comparison</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="keySizeChart" width="400" height="300"></canvas>
+                            </div>
+                            <div class="card-footer bg-transparent">
+                                <small class="text-muted">Post-quantum algorithms generally require larger keys than their classical counterparts.</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header bg-transparent">
+                                <h5 class="mb-0">Signature Size Comparison</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="signatureSizeChart" width="400" height="300"></canvas>
+                            </div>
+                            <div class="card-footer bg-transparent">
+                                <small class="text-muted">Post-quantum signatures are typically much larger than classical signatures.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Transition Strategies -->
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <h4 class="mb-0">
+                    <i class="fas fa-exchange-alt me-2"></i>Migration Strategies
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Immediate Action Items</h5>
+                        <ul class="list-group mb-4">
+                            <li class="list-group-item">
+                                <i class="fas fa-check-circle me-2 text-success"></i>
+                                <strong>Crypto-Agility:</strong> Ensure your systems can easily replace cryptographic primitives
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-check-circle me-2 text-success"></i>
+                                <strong>Hybrid Approach:</strong> Implement both classical and post-quantum algorithms in parallel
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-check-circle me-2 text-success"></i>
+                                <strong>Inventory:</strong> Identify all systems using vulnerable cryptography
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-check-circle me-2 text-success"></i>
+                                <strong>Symmetric Key Sizes:</strong> Ensure AES-256 is used instead of AES-128
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Long-Term Strategies</h5>
+                        <ul class="list-group mb-4">
+                            <li class="list-group-item">
+                                <i class="fas fa-clock me-2 text-primary"></i>
+                                <strong>Standards Monitoring:</strong> Follow NIST standardization efforts
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-clock me-2 text-primary"></i>
+                                <strong>Pilot Projects:</strong> Test PQC in non-critical systems first
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-clock me-2 text-primary"></i>
+                                <strong>Performance Analysis:</strong> Evaluate impact of PQC on system performance
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-clock me-2 text-primary"></i>
+                                <strong>Training:</strong> Educate development teams on PQC implementations
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Quantum Timeline Consideration:</strong> While large-scale quantum computers capable of breaking current cryptography may still be years away, data encrypted today could be stored by adversaries and decrypted once quantum computers become available ("harvest now, decrypt later" attacks). Organizations handling data with long-term sensitivity should begin migration planning now.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Technical Challenges -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <h4 class="mb-0">
+                    <i class="fas fa-cogs me-2"></i>Implementation Challenges
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header bg-danger bg-opacity-10">
+                                <h5 class="mb-0">Size & Bandwidth</h5>
+                            </div>
+                            <div class="card-body">
+                                <p>Post-quantum keys and signatures are significantly larger than classical ones, leading to:</p>
+                                <ul>
+                                    <li>Increased network bandwidth usage</li>
+                                    <li>More storage requirements</li>
+                                    <li>Potential issues with protocols that have message size limitations</li>
+                                    <li>Challenges in constrained environments (IoT, smart cards)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header bg-warning bg-opacity-10">
+                                <h5 class="mb-0">Performance Impact</h5>
+                            </div>
+                            <div class="card-body">
+                                <p>PQC algorithms often have different performance characteristics:</p>
+                                <ul>
+                                    <li>Generally higher computational requirements</li>
+                                    <li>Different algorithms excel in different metrics (key generation, signing, verification)</li>
+                                    <li>May require hardware acceleration for optimal performance</li>
+                                    <li>Can impact latency in time-sensitive applications</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header bg-info bg-opacity-10">
+                                <h5 class="mb-0">Integration Complexity</h5>
+                            </div>
+                            <div class="card-body">
+                                <p>Adopting PQC requires changes across the infrastructure:</p>
+                                <ul>
+                                    <li>Protocol modifications to handle larger keys/signatures</li>
+                                    <li>Certificate management updates</li>
+                                    <li>Changes to key storage and distribution systems</li>
+                                    <li>Updates to cryptographic libraries and APIs</li>
+                                    <li>Interoperability challenges during transition periods</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Key Size Chart
+    const keySizeCtx = document.getElementById('keySizeChart').getContext('2d');
+    
+    // Extract key sizes for chart
+    const keyExchangeLabels = [];
+    const keyExchangeSizes = [];
+    const keyExchangeColors = [];
+    
+    {% for algo in comparison_data.key_exchange %}
+        keyExchangeLabels.push('{{ algo.algorithm }}');
+        
+        // Extract numeric part of key size for chart
+        let sizeStr = '{{ algo.key_size }}';
+        let sizeMatch = sizeStr.match(/(\d+)/);
+        let size = sizeMatch ? parseInt(sizeMatch[0]) : 0;
+        
+        // For PQC algorithms with complex key sizes, just use the first number
+        if (sizeStr.includes('bytes')) {
+            size = Math.min(size, 3000); // Cap size for chart readability
+        }
+        
+        keyExchangeSizes.push(size);
+        keyExchangeColors.push('{{ algo.type }}' === 'Classical' ? 'rgba(255, 99, 132, 0.8)' : 'rgba(75, 192, 192, 0.8)');
+    {% endfor %}
+    
+    new Chart(keySizeCtx, {
+        type: 'bar',
+        data: {
+            labels: keyExchangeLabels,
+            datasets: [{
+                label: 'Key Size (bits/bytes)',
+                data: keyExchangeSizes,
+                backgroundColor: keyExchangeColors,
+                borderColor: keyExchangeColors.map(c => c.replace('0.8', '1')),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Size (bits/bytes)'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const index = context.dataIndex;
+                            return '{{ comparison_data.key_exchange }}' ? '{{ comparison_data.key_exchange[0].key_size }}' : '';
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    // Signature Size Chart
+    const signatureSizeCtx = document.getElementById('signatureSizeChart').getContext('2d');
+    
+    // Extract signature sizes for chart
+    const signatureLabels = [];
+    const signatureSizes = [];
+    const signatureColors = [];
+    
+    {% for algo in comparison_data.signatures %}
+        signatureLabels.push('{{ algo.algorithm }}');
+        
+        // Extract numeric part of signature size for chart
+        let sizeStr = '{{ algo.signature_size }}';
+        let sizeMatch = sizeStr.match(/(\d+)/);
+        let size = sizeMatch ? parseInt(sizeMatch[0]) : 0;
+        
+        signatureSizes.push(size);
+        signatureColors.push('{{ algo.type }}' === 'Classical' ? 'rgba(255, 99, 132, 0.8)' : 'rgba(75, 192, 192, 0.8)');
+    {% endfor %}
+    
+    new Chart(signatureSizeCtx, {
+        type: 'bar',
+        data: {
+            labels: signatureLabels,
+            datasets: [{
+                label: 'Signature Size (bytes)',
+                data: signatureSizes,
+                backgroundColor: signatureColors,
+                borderColor: signatureColors.map(c => c.replace('0.8', '1')),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Size (bytes)'
+                    },
+                    type: 'logarithmic'
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const index = context.dataIndex;
+                            return context.dataset.data[index] + ' bytes';
+                        }
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

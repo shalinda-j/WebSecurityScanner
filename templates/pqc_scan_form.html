@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block title %}PQC Security Scan - Web App Penetration Testing Toolkit{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">
+                        <i class="fas fa-search me-2"></i>Post-Quantum Cryptography Security Scan
+                    </h2>
+                    <a href="{{ url_for('pqc_bp.pqc_dashboard') }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Back to PQC Dashboard
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    This scan will analyze a target website for quantum-vulnerable cryptographic implementations and provide recommendations for improving post-quantum security.
+                </div>
+                
+                <form action="{{ url_for('scan_bp.start_scan') }}" method="post" class="needs-validation" novalidate>
+                    <div class="mb-4">
+                        <label for="target_url" class="form-label">Target URL</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-globe"></i></span>
+                            <input type="url" class="form-control" id="target_url" name="target_url" placeholder="https://example.com" required>
+                            <div class="invalid-feedback">
+                                Please enter a valid URL starting with http:// or https://
+                            </div>
+                        </div>
+                        <small class="text-muted">Enter the full URL of the target website to scan</small>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label">Scan Modules</label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="module_pqc" name="modules" value="pqc" checked>
+                                    <label class="form-check-label" for="module_pqc">
+                                        <strong>Post-Quantum Cryptography</strong>
+                                        <p class="text-muted mb-0">Detect quantum-vulnerable cryptographic implementations</p>
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="module_config" name="modules" value="config">
+                                    <label class="form-check-label" for="module_config">
+                                        <strong>Configuration Analysis</strong>
+                                        <p class="text-muted mb-0">Check for security headers, SSL/TLS configuration</p>
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="module_version" name="modules" value="version">
+                                    <label class="form-check-label" for="module_version">
+                                        <strong>Version Detection</strong>
+                                        <p class="text-muted mb-0">Identify outdated software with known vulnerabilities</p>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="module_sql" name="modules" value="sql">
+                                    <label class="form-check-label" for="module_sql">
+                                        <strong>SQL Injection</strong>
+                                        <p class="text-muted mb-0">Test for SQL injection vulnerabilities</p>
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="module_xss" name="modules" value="xss">
+                                    <label class="form-check-label" for="module_xss">
+                                        <strong>Cross-Site Scripting (XSS)</strong>
+                                        <p class="text-muted mb-0">Check for XSS vulnerabilities in parameters</p>
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="module_exposure" name="modules" value="exposure">
+                                    <label class="form-check-label" for="module_exposure">
+                                        <strong>Data Exposure</strong>
+                                        <p class="text-muted mb-0">Find sensitive data exposed in responses</p>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <a class="btn btn-sm btn-secondary" data-bs-toggle="collapse" href="#advancedOptions" role="button" aria-expanded="false" aria-controls="advancedOptions">
+                            <i class="fas fa-cog me-1"></i>Advanced Options
+                        </a>
+                        
+                        <div class="collapse mt-3" id="advancedOptions">
+                            <div class="card card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="crawl_depth" class="form-label">Crawl Depth</label>
+                                            <input type="number" class="form-control" id="crawl_depth" name="crawl_depth" min="1" max="10" value="2">
+                                            <small class="text-muted">How many links deep to crawl (1-10)</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="request_timeout" class="form-label">Request Timeout (seconds)</label>
+                                            <input type="number" class="form-control" id="request_timeout" name="request_timeout" min="5" max="120" value="30">
+                                            <small class="text-muted">Maximum time to wait for responses (5-120)</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="user_agent" class="form-label">User Agent</label>
+                                            <input type="text" class="form-control" id="user_agent" name="user_agent" placeholder="Default: WebAppPenTestKit/1.0">
+                                            <small class="text-muted">Custom User-Agent header for requests</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="cookies" class="form-label">Cookies</label>
+                                            <input type="text" class="form-control" id="cookies" name="cookies" placeholder="name1=value1; name2=value2">
+                                            <small class="text-muted">Optional cookies to include with requests</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="consent" name="consent" required>
+                            <label class="form-check-label" for="consent">
+                                I confirm that I have authorization to perform security testing on this target
+                            </label>
+                            <div class="invalid-feedback">
+                                You must confirm that you have authorization before starting the scan
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-play me-2"></i>Start PQC Security Scan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PQC Scan Information -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <h4 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>About PQC Scanning
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>What This Scan Checks For</h5>
+                        <ul>
+                            <li><strong>Quantum-Vulnerable Cryptography</strong>: Identifies the use of RSA, ECC, or other algorithms vulnerable to quantum attacks</li>
+                            <li><strong>Insufficient Key Sizes</strong>: Detects cryptographic keys that may be too small for quantum resistance</li>
+                            <li><strong>TLS Configuration</strong>: Analyzes the TLS configuration for quantum-safe cipher suites</li>
+                            <li><strong>Certificate Analysis</strong>: Examines certificates for quantum-vulnerable algorithms</li>
+                            <li><strong>Implementation Issues</strong>: Identifies potential implementation problems in cryptographic protocols</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Scan Limitations</h5>
+                        <ul>
+                            <li>The scan can only detect externally observable cryptographic information</li>
+                            <li>Internal cryptographic implementations may not be detectable</li>
+                            <li>The scan is non-intrusive and does not attempt to exploit vulnerabilities</li>
+                            <li>Results are based on current best practices and may change as PQC standards evolve</li>
+                            <li>This scan is for educational and awareness purposes and should be part of a comprehensive security assessment</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning mt-3">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Legal Notice:</strong> Only scan websites you own or have explicit permission to test. Unauthorized scanning may violate computer crime laws.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
