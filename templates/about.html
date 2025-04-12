@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block title %}About - Web App Penetration Testing Toolkit{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <h2 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>About the Toolkit
+                </h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h3>Web Application Penetration Testing Toolkit</h3>
+                        <p class="lead">A comprehensive security testing tool designed to identify vulnerabilities in web applications.</p>
+                        
+                        <p>This toolkit helps security professionals and developers identify and remediate potential security issues before they can be exploited by attackers. It performs automated scanning and analysis of web applications to detect common vulnerabilities such as SQL injection, XSS, outdated software, misconfigurations, and data exposure.</p>
+                        
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Important:</strong> This tool should only be used against applications you have explicit permission to test. Unauthorized scanning may be illegal and unethical.
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="bg-dark p-4 rounded mb-3">
+                            <i class="fas fa-shield-alt fa-5x text-primary mb-3"></i>
+                            <p class="mb-0">For authorized testing only</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <h4>Key Features</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="list-group mb-4">
+                            <li class="list-group-item">
+                                <i class="fas fa-search me-2 text-primary"></i>
+                                <strong>Comprehensive Scanning</strong>
+                                <p class="mb-0 text-muted">Discovers and tests all accessible pages and parameters</p>
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-virus-slash me-2 text-danger"></i>
+                                <strong>Vulnerability Detection</strong>
+                                <p class="mb-0 text-muted">Identifies common web vulnerabilities like SQL injection and XSS</p>
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-cogs me-2 text-warning"></i>
+                                <strong>Configuration Analysis</strong>
+                                <p class="mb-0 text-muted">Detects misconfigurations and insecure settings</p>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-group mb-4">
+                            <li class="list-group-item">
+                                <i class="fas fa-code me-2 text-info"></i>
+                                <strong>Version Detection</strong>
+                                <p class="mb-0 text-muted">Identifies outdated software with known vulnerabilities</p>
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-eye-slash me-2 text-success"></i>
+                                <strong>Data Exposure Scanning</strong>
+                                <p class="mb-0 text-muted">Finds sensitive data leaked in responses</p>
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-file-alt me-2 text-primary"></i>
+                                <strong>Detailed Reporting</strong>
+                                <p class="mb-0 text-muted">Provides actionable remediation steps for each finding</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <h4>Scanning Modules</h4>
+                <div class="accordion" id="modulesAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingSQLi">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSQLi" aria-expanded="false" aria-controls="collapseSQLi">
+                                SQL Injection Scanner
+                            </button>
+                        </h2>
+                        <div id="collapseSQLi" class="accordion-collapse collapse" aria-labelledby="headingSQLi" data-bs-parent="#modulesAccordion">
+                            <div class="accordion-body">
+                                <p>Tests parameters for SQL injection vulnerabilities by sending crafted payloads and analyzing responses for error patterns that indicate SQL injection possibilities.</p>
+                                <p>This module helps identify weak points where user input might be directly incorporated into database queries without proper validation or parameterization.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingXSS">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseXSS" aria-expanded="false" aria-controls="collapseXSS">
+                                Cross-Site Scripting (XSS) Scanner
+                            </button>
+                        </h2>
+                        <div id="collapseXSS" class="accordion-collapse collapse" aria-labelledby="headingXSS" data-bs-parent="#modulesAccordion">
+                            <div class="accordion-body">
+                                <p>Identifies XSS vulnerabilities by injecting JavaScript payloads into parameters and checking if they're reflected in the response without proper encoding.</p>
+                                <p>This helps prevent attackers from being able to inject client-side scripts into pages viewed by other users, potentially stealing cookies or session tokens.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingVersion">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseVersion" aria-expanded="false" aria-controls="collapseVersion">
+                                Version Detection
+                            </button>
+                        </h2>
+                        <div id="collapseVersion" class="accordion-collapse collapse" aria-labelledby="headingVersion" data-bs-parent="#modulesAccordion">
+                            <div class="accordion-body">
+                                <p>Analyzes HTTP headers and response content to identify software versions and frameworks in use. Cross-references detected versions against a database of known vulnerable versions.</p>
+                                <p>This module helps identify components that need updates to patch known security vulnerabilities.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingConfig">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseConfig" aria-expanded="false" aria-controls="collapseConfig">
+                                Configuration Analyzer
+                            </button>
+                        </h2>
+                        <div id="collapseConfig" class="accordion-collapse collapse" aria-labelledby="headingConfig" data-bs-parent="#modulesAccordion">
+                            <div class="accordion-body">
+                                <p>Checks for server misconfigurations, missing security headers, directory listings, and exposed sensitive files. Also examines cookie settings for security attributes.</p>
+                                <p>This helps identify security gaps in the application's configuration that could be exploited by attackers.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingExposure">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExposure" aria-expanded="false" aria-controls="collapseExposure">
+                                Data Exposure Scanner
+                            </button>
+                        </h2>
+                        <div id="collapseExposure" class="accordion-collapse collapse" aria-labelledby="headingExposure" data-bs-parent="#modulesAccordion">
+                            <div class="accordion-body">
+                                <p>Scans responses for exposed sensitive data such as API keys, email addresses, internal IPs, and potential passwords. Also examines HTML comments for sensitive information.</p>
+                                <p>This module helps prevent accidental exposure of confidential information that could be used by attackers.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <h4>Usage Guidelines</h4>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="alert alert-info">
+                            <h5><i class="fas fa-user-shield me-2"></i>Ethical Use</h5>
+                            <ul class="mb-0">
+                                <li>Only scan websites you own or have explicit permission to test</li>
+                                <li>Review and comply with the target's security testing policies</li>
+                                <li>Avoid testing during peak hours to minimize impact</li>
+                                <li>Report findings responsibly to the appropriate parties</li>
+                                <li>Do not use this tool for malicious purposes</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

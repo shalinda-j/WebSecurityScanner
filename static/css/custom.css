@@ -1,0 +1,167 @@
+/* Custom CSS for Web Application Penetration Testing Toolkit */
+
+/* Using the Replit-themed Bootstrap dark theme 
+   Most styles come from the Bootstrap theme, keeping custom CSS minimal */
+
+/* === General Styles === */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.footer {
+    margin-top: auto;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* === Dashboard Cards === */
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* === Navigation === */
+.navbar-brand {
+    font-weight: bold;
+}
+
+.nav-link.active {
+    font-weight: 500;
+}
+
+/* === Vulnerability Badges === */
+.badge.bg-danger {
+    background-color: var(--bs-danger) !important;
+}
+
+.badge.bg-warning {
+    background-color: var(--bs-warning) !important;
+}
+
+.badge.bg-info {
+    background-color: var(--bs-info) !important;
+}
+
+.badge.bg-success {
+    background-color: var(--bs-success) !important;
+}
+
+.badge.bg-secondary {
+    background-color: var(--bs-secondary) !important;
+}
+
+/* === Tables === */
+.table {
+    vertical-align: middle;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.075);
+}
+
+/* === Form Elements === */
+.input-group-text {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* === Report Details === */
+.vulnerability-details .accordion-button:not(.collapsed) {
+    color: #fff;
+    background-color: rgba(13, 110, 253, 0.1);
+}
+
+.vulnerability-details .accordion-button:focus {
+    box-shadow: none;
+    border-color: rgba(255, 255, 255, 0.125);
+}
+
+pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* === Progress Bars === */
+.progress {
+    height: 1.5rem;
+    border-radius: 0.25rem;
+    margin-top: 0.5rem;
+}
+
+.progress-bar {
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+    padding: 0 0.5rem;
+}
+
+/* === Scan Results === */
+#scan-progress {
+    margin: 2rem 0;
+}
+
+#scan-progress .progress {
+    height: 2rem;
+}
+
+#scan-progress .progress-bar {
+    font-size: 1rem;
+    font-weight: 500;
+    background-color: var(--bs-primary);
+}
+
+/* === Charts === */
+canvas {
+    max-width: 100%;
+}
+
+/* === Alerts === */
+.alert {
+    margin-bottom: 1.5rem;
+}
+
+.alert-dismissible .btn-close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+}
+
+/* === Toast Notifications === */
+.toast {
+    background-color: var(--bs-dark);
+    color: #fff;
+}
+
+.toast-header {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+/* === Responsive Adjustments === */
+@media (max-width: 768px) {
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    
+    h2 {
+        font-size: 1.75rem;
+    }
+    
+    h3 {
+        font-size: 1.5rem;
+    }
+    
+    .table-responsive {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+}

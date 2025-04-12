@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}Reports - Web App Penetration Testing Toolkit{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">
+                        <i class="fas fa-file-alt me-2"></i>Security Reports
+                    </h2>
+                    <a href="{{ url_for('scan_bp.new_scan') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>New Scan
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if reports %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Report</th>
+                                    <th>Date</th>
+                                    <th>Vulnerabilities</th>
+                                    <th>Risk Level</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for report in reports %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ url_for('reports_bp.view_report', report_id=report.id) }}">
+                                            {{ report.title }}
+                                        </a>
+                                    </td>
+                                    <td>{{ report.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td>
+                                        {% set counts = report.get_vulnerability_count_by_severity() %}
+                                        <div class="d-flex">
+                                            <span class="badge bg-danger me-1">{{ counts['Critical'] }}</span>
+                                            <span class="badge bg-warning text-dark me-1">{{ counts['High'] }}</span>
+                                            <span class="badge bg-info me-1">{{ counts['Medium'] }}</span>
+                                            <span class="badge bg-success me-1">{{ counts['Low'] }}</span>
+                                            <span class="badge bg-secondary">{{ counts['Info'] }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% set total = counts['Critical'] * 10 + counts['High'] * 5 + counts['Medium'] * 2 + counts['Low'] * 0.5 %}
+                                        {% if total >= 20 %}
+                                            <span class="badge bg-danger">Critical</span>
+                                        {% elif total >= 10 %}
+                                            <span class="badge bg-warning text-dark">High</span>
+                                        {% elif total >= 5 %}
+                                            <span class="badge bg-info">Medium</span>
+                                        {% elif total > 0 %}
+                                            <span class="badge bg-success">Low</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Info</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{{ url_for('reports_bp.view_report', report_id=report.id) }}" class="btn btn-sm btn-info" title="View Report">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ url_for('reports_bp.export_report', report_id=report.id, format='json') }}" class="btn btn-sm btn-secondary" title="Export as JSON">
+                                                <i class="fas fa-download"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-danger" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#deleteReportModal{{ report.id }}" 
+                                                title="Delete Report">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Delete Modal -->
+                                        <div class="modal fade" id="deleteReportModal{{ report.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ report.id }}" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="deleteModalLabel{{ report.id }}">Confirm Delete</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        Are you sure you want to delete the report "{{ report.title }}"? This action cannot be undone.
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                        <form action="{{ url_for('reports_bp.delete_report', report_id=report.id) }}" method="post">
+                                                            <button type="submit" class="btn btn-danger">Delete Report</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>No reports available yet.
+                        <a href="{{ url_for('scan_bp.new_scan') }}" class="alert-link">Start a scan</a> to generate a security report.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Export Options Card -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <h4 class="mb-0">
+                    <i class="fas fa-file-export me-2"></i>Export Options
+                </h4>
+            </div>
+            <div class="card-body">
+                <p>Reports can be exported in the following formats:</p>
+                <ul>
+                    <li><strong>JSON</strong> - Complete report data in structured format</li>
+                    <li><strong>CSV</strong> - Vulnerability list in tabular format</li>
+                </ul>
+                <p class="text-muted mb-0">Use the export buttons in the Actions column to download a report in your preferred format.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

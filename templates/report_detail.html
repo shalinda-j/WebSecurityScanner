@@ -1,0 +1,267 @@
+{% extends 'base.html' %}
+
+{% block title %}Security Report - Web App Penetration Testing Toolkit{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-transparent">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">
+                        <i class="fas fa-file-alt me-2"></i>{{ report.title }}
+                    </h2>
+                    <div>
+                        <a href="{{ url_for('reports_bp.list_reports') }}" class="btn btn-sm btn-outline-secondary me-2">
+                            <i class="fas fa-arrow-left me-1"></i>Back to Reports
+                        </a>
+                        <div class="btn-group">
+                            <a href="{{ url_for('reports_bp.export_report', report_id=report.id, format='json') }}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-download me-1"></i>Export JSON
+                            </a>
+                            <a href="{{ url_for('reports_bp.export_report', report_id=report.id, format='csv') }}" class="btn btn-sm btn-secondary">
+                                <i class="fas fa-file-csv me-1"></i>Export CSV
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <p><strong>Date:</strong> {{ report.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                        <p>
+                            <strong>Target:</strong> 
+                            {% if related_scans %}
+                                <a href="{{ related_scans[0].target_url }}" target="_blank">
+                                    {{ related_scans[0].target_url }}
+                                    <i class="fas fa-external-link-alt ms-1 small"></i>
+                                </a>
+                            {% else %}
+                                Unknown
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-2">
+                            <h5 class="mb-0 me-3">Vulnerability Overview</h5>
+                            <span class="badge bg-danger me-1">{{ report.get_vulnerability_count_by_severity()['Critical'] }} Critical</span>
+                            <span class="badge bg-warning text-dark me-1">{{ report.get_vulnerability_count_by_severity()['High'] }} High</span>
+                            <span class="badge bg-info me-1">{{ report.get_vulnerability_count_by_severity()['Medium'] }} Medium</span>
+                            <span class="badge bg-success me-1">{{ report.get_vulnerability_count_by_severity()['Low'] }} Low</span>
+                            <span class="badge bg-secondary">{{ report.get_vulnerability_count_by_severity()['Info'] }} Info</span>
+                        </div>
+                        <div class="progress">
+                            {% set counts = report.get_vulnerability_count_by_severity() %}
+                            {% set total = counts['Critical'] + counts['High'] + counts['Medium'] + counts['Low'] + counts['Info'] %}
+                            {% if total > 0 %}
+                                <div class="progress-bar bg-danger" role="progressbar" 
+                                    style="width: {{ (counts['Critical'] / total * 100) | round(1) }}%" 
+                                    title="{{ counts['Critical'] }} Critical">
+                                    {% if counts['Critical'] / total > 0.05 %}{{ counts['Critical'] }}{% endif %}
+                                </div>
+                                <div class="progress-bar bg-warning" role="progressbar" 
+                                    style="width: {{ (counts['High'] / total * 100) | round(1) }}%" 
+                                    title="{{ counts['High'] }} High">
+                                    {% if counts['High'] / total > 0.05 %}{{ counts['High'] }}{% endif %}
+                                </div>
+                                <div class="progress-bar bg-info" role="progressbar" 
+                                    style="width: {{ (counts['Medium'] / total * 100) | round(1) }}%" 
+                                    title="{{ counts['Medium'] }} Medium">
+                                    {% if counts['Medium'] / total > 0.05 %}{{ counts['Medium'] }}{% endif %}
+                                </div>
+                                <div class="progress-bar bg-success" role="progressbar" 
+                                    style="width: {{ (counts['Low'] / total * 100) | round(1) }}%" 
+                                    title="{{ counts['Low'] }} Low">
+                                    {% if counts['Low'] / total > 0.05 %}{{ counts['Low'] }}{% endif %}
+                                </div>
+                                <div class="progress-bar bg-secondary" role="progressbar" 
+                                    style="width: {{ (counts['Info'] / total * 100) | round(1) }}%" 
+                                    title="{{ counts['Info'] }} Info">
+                                    {% if counts['Info'] / total > 0.05 %}{{ counts['Info'] }}{% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Vulnerability Chart -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <canvas id="severityChart" width="400" height="250"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <canvas id="vulnTypesChart" width="400" height="250"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Executive Summary -->
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="mb-0">Executive Summary</h4>
+                            </div>
+                            <div class="card-body">
+                                <pre class="text-white bg-dark p-3 rounded">{{ report.summary }}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Vulnerability Tabs -->
+                <div class="vulnerability-details">
+                    <h3 class="mb-3">Detailed Findings</h3>
+                    
+                    <ul class="nav nav-tabs" id="vulnTabs" role="tablist">
+                        {% for severity in ['Critical', 'High', 'Medium', 'Low', 'Info'] %}
+                            {% if vulnerabilities_by_severity[severity] %}
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link {% if loop.first %}active{% endif %}" 
+                                        id="{{ severity.lower() }}-tab" 
+                                        data-bs-toggle="tab" 
+                                        data-bs-target="#{{ severity.lower() }}" 
+                                        type="button" role="tab" 
+                                        aria-controls="{{ severity.lower() }}" 
+                                        aria-selected="{% if loop.first %}true{% else %}false{% endif %}">
+                                        {{ severity }}
+                                        <span class="badge {% if severity == 'Critical' %}bg-danger
+                                                           {% elif severity == 'High' %}bg-warning text-dark
+                                                           {% elif severity == 'Medium' %}bg-info
+                                                           {% elif severity == 'Low' %}bg-success
+                                                           {% else %}bg-secondary{% endif %} ms-1">
+                                            {{ vulnerabilities_by_severity[severity]|length }}
+                                        </span>
+                                    </button>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                    
+                    <div class="tab-content p-3 border border-top-0 rounded-bottom" id="vulnTabContent">
+                        {% for severity in ['Critical', 'High', 'Medium', 'Low', 'Info'] %}
+                            {% if vulnerabilities_by_severity[severity] %}
+                                <div class="tab-pane fade {% if loop.first %}show active{% endif %}" 
+                                    id="{{ severity.lower() }}" role="tabpanel" 
+                                    aria-labelledby="{{ severity.lower() }}-tab">
+                                    
+                                    <div class="accordion" id="{{ severity.lower() }}Accordion">
+                                        {% for vuln in vulnerabilities_by_severity[severity] %}
+                                            <div class="accordion-item">
+                                                <h2 class="accordion-header" id="heading{{ severity }}{{ loop.index }}">
+                                                    <button class="accordion-button collapsed" type="button" 
+                                                        data-bs-toggle="collapse" 
+                                                        data-bs-target="#collapse{{ severity }}{{ loop.index }}" 
+                                                        aria-expanded="false" 
+                                                        aria-controls="collapse{{ severity }}{{ loop.index }}">
+                                                        <span class="fw-bold">{{ vuln.type }}</span>
+                                                        <span class="text-muted ms-2">- {{ vuln.location }}</span>
+                                                    </button>
+                                                </h2>
+                                                <div id="collapse{{ severity }}{{ loop.index }}" 
+                                                    class="accordion-collapse collapse" 
+                                                    aria-labelledby="heading{{ severity }}{{ loop.index }}" 
+                                                    data-bs-parent="#{{ severity.lower() }}Accordion">
+                                                    <div class="accordion-body">
+                                                        <h5>Description</h5>
+                                                        <p>{{ vuln.description }}</p>
+                                                        
+                                                        {% if vuln.proof %}
+                                                            <h5>Evidence</h5>
+                                                            <div class="bg-dark text-white p-2 rounded mb-3">
+                                                                <pre class="mb-0">{{ vuln.proof }}</pre>
+                                                            </div>
+                                                        {% endif %}
+                                                        
+                                                        {% if vuln.remediation %}
+                                                            <h5>Remediation</h5>
+                                                            <div class="bg-success bg-opacity-10 p-3 rounded">
+                                                                <pre class="mb-0 text-success">{{ vuln.remediation }}</pre>
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/chart_generator.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Data for severity chart
+    const severityData = {
+        labels: ['Critical', 'High', 'Medium', 'Low', 'Info'],
+        datasets: [{
+            label: 'Vulnerabilities by Severity',
+            data: [
+                {{ report.get_vulnerability_count_by_severity()['Critical'] }},
+                {{ report.get_vulnerability_count_by_severity()['High'] }},
+                {{ report.get_vulnerability_count_by_severity()['Medium'] }},
+                {{ report.get_vulnerability_count_by_severity()['Low'] }},
+                {{ report.get_vulnerability_count_by_severity()['Info'] }}
+            ],
+            backgroundColor: [
+                '#dc3545', // Critical - Red
+                '#fd7e14', // High - Orange
+                '#0dcaf0', // Medium - Blue
+                '#198754', // Low - Green
+                '#adb5bd'  // Info - Gray
+            ],
+            borderWidth: 1
+        }]
+    };
+    
+    // Create severity chart
+    createDoughnutChart('severityChart', 'Vulnerabilities by Severity', severityData);
+    
+    // Collect vulnerability types
+    const vulnTypes = {};
+    {% for severity in ['Critical', 'High', 'Medium', 'Low', 'Info'] %}
+        {% for vuln in vulnerabilities_by_severity[severity] %}
+            if (!vulnTypes['{{ vuln.type }}']) {
+                vulnTypes['{{ vuln.type }}'] = 0;
+            }
+            vulnTypes['{{ vuln.type }}']++;
+        {% endfor %}
+    {% endfor %}
+    
+    // Create vulnerability types chart
+    const vulnTypesLabels = Object.keys(vulnTypes);
+    const vulnTypesValues = Object.values(vulnTypes);
+    
+    const vulnTypesData = {
+        labels: vulnTypesLabels,
+        datasets: [{
+            label: 'Vulnerability Types',
+            data: vulnTypesValues,
+            backgroundColor: [
+                '#dc3545', // Red
+                '#fd7e14', // Orange
+                '#ffc107', // Yellow
+                '#0dcaf0', // Blue
+                '#198754', // Green
+                '#6f42c1', // Purple
+                '#d63384', // Pink
+                '#20c997', // Teal
+                '#0d6efd', // Primary blue
+                '#6c757d'  // Gray
+            ],
+            borderWidth: 1
+        }]
+    };
+    
+    createBarChart('vulnTypesChart', 'Vulnerability Types', vulnTypesData);
+});
+</script>
+{% endblock %}
