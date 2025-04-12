@@ -9,6 +9,7 @@ from .xss_scanner import XSSScanner
 from .version_detector import VersionDetector
 from .config_analyzer import ConfigAnalyzer
 from .data_exposure import DataExposureScanner
+from .pqc_module import PQCryptographyModule
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +71,8 @@ class ScannerEngine:
             'xss': XSSScanner,
             'version': VersionDetector,
             'config': ConfigAnalyzer,
-            'exposure': DataExposureScanner
+            'exposure': DataExposureScanner,
+            'pqc': PQCryptographyModule
         }
         
         # Run each requested module

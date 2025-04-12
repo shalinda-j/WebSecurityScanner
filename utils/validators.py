@@ -140,7 +140,7 @@ def is_valid_scan_module(module_name):
         bool: True if valid module, False otherwise
     """
     # List of valid scanning modules
-    valid_modules = ['sql', 'xss', 'version', 'config', 'exposure']
+    valid_modules = ['sql', 'xss', 'version', 'config', 'exposure', 'pqc']
     
     return module_name in valid_modules
 
