@@ -328,8 +328,8 @@ document.addEventListener('DOMContentLoaded', function() {
         signatureLabels.push('{{ algo.algorithm }}');
         
         // Extract numeric part of signature size for chart
-        let sizeStr = '{{ algo.signature_size }}';
-        let sizeMatch = sizeStr.match(/(\d+)/);
+        let sigSizeStr = '{{ algo.signature_size }}';
+        let sizeMatch = sigSizeStr.match(/(\d+)/);
         let size = sizeMatch ? parseInt(sizeMatch[0]) : 0;
         
         signatureSizes.push(size);
