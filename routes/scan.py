@@ -135,63 +135,66 @@ def run_scan_task(scan_id, config, modules):
     """
     Background task to run the scan
     """
-    try:
-        # Get scan record
-        scan = Scan.query.get(scan_id)
-        if not scan:
-            logger.error(f"Scan {scan_id} not found")
-            return
-        
-        # Initialize scanner
-        scanner = ScannerEngine(config)
-        
-        # Run scan
-        results = scanner.run_scan(modules)
-        
-        # Generate report
-        report_generator = ReportGenerator()
-        report_data = report_generator.generate_report(scan.target_url, results)
-        
-        # Create report record
-        report = Report(
-            title=f"Security Scan for {scan.target_url}",
-            summary=report_data['executive_summary'],
-            created_at=datetime.utcnow()
-        )
-        
-        # Save report
-        db.session.add(report)
-        db.session.flush()  # Get report ID without committing
-        
-        # Update scan with report ID
-        scan.report_id = report.id
-        scan.status = 'completed'
-        
-        # Add vulnerabilities to the report
-        for module_name, module_results in results.items():
-            for vuln_data in module_results:
-                vulnerability = Vulnerability(
-                    report_id=report.id,
-                    type=vuln_data['type'],
-                    severity=vuln_data['severity'],
-                    description=vuln_data['description'],
-                    location=vuln_data['location'],
-                    proof=vuln_data.get('proof', ''),
-                    remediation=vuln_data.get('remediation', '')
-                )
-                db.session.add(vulnerability)
-        
-        # Commit all changes
-        db.session.commit()
-        logger.info(f"Scan {scan_id} completed successfully")
-        
-    except Exception as e:
-        logger.error(f"Error running scan {scan_id}: {str(e)}")
+    from app import app
+    
+    with app.app_context():
         try:
-            # Update scan status to failed
+            # Get scan record
             scan = Scan.query.get(scan_id)
-            if scan:
-                scan.status = 'failed'
-                db.session.commit()
-        except Exception as commit_error:
-            logger.error(f"Error updating scan status: {str(commit_error)}")
+            if not scan:
+                logger.error(f"Scan {scan_id} not found")
+                return
+            
+            # Initialize scanner
+            scanner = ScannerEngine(config)
+            
+            # Run scan
+            results = scanner.run_scan(modules)
+            
+            # Generate report
+            report_generator = ReportGenerator()
+            report_data = report_generator.generate_report(scan.target_url, results)
+            
+            # Create report record
+            report = Report(
+                title=f"Security Scan for {scan.target_url}",
+                summary=report_data['executive_summary'],
+                created_at=datetime.utcnow()
+            )
+            
+            # Save report
+            db.session.add(report)
+            db.session.flush()  # Get report ID without committing
+            
+            # Update scan with report ID
+            scan.report_id = report.id
+            scan.status = 'completed'
+            
+            # Add vulnerabilities to the report
+            for module_name, module_results in results.items():
+                for vuln_data in module_results:
+                    vulnerability = Vulnerability(
+                        report_id=report.id,
+                        type=vuln_data['type'],
+                        severity=vuln_data['severity'],
+                        description=vuln_data['description'],
+                        location=vuln_data['location'],
+                        proof=vuln_data.get('proof', ''),
+                        remediation=vuln_data.get('remediation', '')
+                    )
+                    db.session.add(vulnerability)
+            
+            # Commit all changes
+            db.session.commit()
+            logger.info(f"Scan {scan_id} completed successfully")
+            
+        except Exception as e:
+            logger.error(f"Error running scan {scan_id}: {str(e)}")
+            try:
+                # Update scan status to failed
+                scan = Scan.query.get(scan_id)
+                if scan:
+                    scan.status = 'failed'
+                    db.session.commit()
+            except Exception as commit_error:
+                logger.error(f"Error updating scan status: {str(commit_error)}")
